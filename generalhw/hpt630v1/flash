@@ -1,0 +1,31 @@
+#!/bin/bash
+
+rte_ip=$1
+pikvm_ip=$2
+image=$3
+# shellcheck disable=SC2034
+image_size=$4 # unused
+
+if [ -z "$image" ]; then
+    echo "No image to flash, successfully doing nothing."
+    exit 0
+fi
+
+if [ ! -f "$image" ]; then
+    echo "error: couldn't find '$image'" 1>&2
+    exit 1
+fi
+
+echo "flash: setting up data for network boot"
+
+web_dir=/srv/www/openqa
+script_dir=$(dirname "$(readlink -f "$0")")
+openqa_ip=$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')
+
+sudo umount --quiet "$web_dir/iso" || true
+
+mkdir -p "$web_dir/iso"
+ln -fs "$script_dir/ks.cfg" "$web_dir/ks.cfg"
+sed "s/@@OPENQA_IP@@/$openqa_ip/" "$script_dir/ipxe" > "$web_dir/ipxe"
+
+sudo mount -t iso9660 -o ro,nodev,nosuid,noexec "$image" "$web_dir/iso"

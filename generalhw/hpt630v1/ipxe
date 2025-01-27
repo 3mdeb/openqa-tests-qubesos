@@ -1,0 +1,6 @@
+#!ipxe
+set host http://@@OPENQA_IP@@:8080
+set base iso/images/pxeboot
+kernel ${base}/vmlinuz inst.repo=${host}/iso inst.sshd inst.ks=${host}/ks.cfg reboot=pci plymouth.ignore-serial-consoles
+initrd ${base}/initrd.img
+boot

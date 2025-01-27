@@ -1,0 +1,109 @@
+#!/bin/bash
+
+rte_ip=$1
+pikvm_ip=$2
+action=$3
+
+if [ "$action" != pon ] && [ "$action" != poff ]; then
+    echo "Unexpected action: '$action'"
+    exit 1
+fi
+
+# if you want to run some openQA test without rebooting SUT to save time
+# echo "$0: not doing anything"
+# exit 0
+
+function sonoff_pwr() {
+    cmd=$1
+    p=${cmd:0:1}
+    if [[ $p == 'p' ]]; then
+        cmd=${cmd:1}
+    fi
+    post_params="cmnd=Power $1"
+    echo "Sending sonoff POST request: $post_params\n"
+    curl -X POST http://192.168.10.157/cm -d "cmnd=Power $1" && echo "\n"
+}
+
+
+function pikvm_cmd() {
+    sshpass -proot \
+            ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$pikvm_ip" \
+                "$@"
+}
+
+function rte_cmd() {
+    sshpass -pmeta-rte \
+            ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$rte_ip" \
+                "$@"
+}
+
+function setup_video() {
+    echo "Skipping setting EDID, because PiKVM of HPt630 sets it on startup"
+
+    echo "Setting DV timings"
+    pikvm_cmd v4l2-ctl --set-dv-bt-timings cvt,width=1024,height=768,fps=60,clear,reduced-blanking=1
+}
+
+function get_dut_state() {
+    setup_video 1>&2
+
+    pikvm_cmd timeout 0.1s dd if=/dev/video0 of=/dev/null bs=1 count=5 2>/dev/null
+    local exit_code=$?
+
+    if [ "$exit_code" -eq 124 ]; then
+        # timeout because no reading happens when there is no signal
+        echo DUT is off 1>&2
+        echo off
+    elif [ "$exit_code" -eq 0 ]; then
+        # have video signal
+        echo DUT is on 1>&2
+        echo on
+    elif pikvm_cmd ps aux | grep -q /usr/bin/ustreamer; then
+        echo "Video device of '$pikvm_ip' seems to be in use by PiKVM.  Stopping kvmd!" 1>&2
+        pikvm_cmd systemctl stop kvmd 1>&2
+        # recurse, this shouldn't loop, I think
+        get_dut_state
+    else
+        echo "Failed to determine DUT's state" 1>&2
+        echo unknown
+    fi
+}
+
+state=$(get_dut_state)
+if [ "$action" = "p$state" ]; then
+    # nothing to do
+    echo "Nothing to do: DUT is already '${action:1}'."
+    exit 0
+fi
+
+function leave()
+{
+    local code=$1
+    local msg=$2
+
+    # kvmd should be enabled back if it was disabled
+    # It must be running for VNC to work
+    if ! pikvm_cmd systemctl is-active --quiet kvmd; then
+        pikvm_cmd systemctl start kvmd
+    fi
+
+    echo "$msg"
+    exit "$code"
+}
+
+for i in {1..10}; do
+    # if there was no progress in 5 seconds, give it one more try
+    if [ "$i" = 1 ] || [ "$i" = 6 ]; then
+        #rte_cmd rte_ctrl "$action"
+        sonoff_pwr $action
+    fi
+
+    sleep 1
+    if [ "p$(get_dut_state)" = "$action" ]; then
+        leave 0 "Switched DUT's state: '$state' -> '${action:1}'."
+    fi
+done
+
+if [ "$i" == 10 ]; then
+    leave 1 "Failed to switch DUT ${action:1}."
+fi
