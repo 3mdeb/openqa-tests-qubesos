@@ -15,13 +15,10 @@ fi
 
 function sonoff_pwr() {
     cmd=$1
-    p=${cmd:0:1}
-    if [[ $p == 'p' ]]; then
-        cmd=${cmd:1}
-    fi
-    post_params="cmnd=Power $1"
+    cmd=$(cut -d "p" -f2 <<< "$cmd" )
+    post_params="cmnd=Power $cmd"
     echo "Sending sonoff POST request: $post_params\n"
-    curl -X POST http://192.168.10.157/cm -d "cmnd=Power $1" && echo "\n"
+    curl -X POST http://192.168.10.157/cm -d "$post_params" && echo "\n"
 }
 
 
