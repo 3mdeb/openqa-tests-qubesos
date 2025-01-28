@@ -41,6 +41,19 @@ VNC-based setup for OptiPlex.  New setups should use VNC if possible (see
   - the GRUB image comes with `iPXE.lkrn` which downloads kernel and initrd
     over the network and starts it
 
+* [hp](hp/README.md)
+
+  - VNC-based
+  - configuration based on optiplex
+  - input is handled by VNC (`kvmd-vnc`)
+  - Kickstart configuration is served by openQA server
+  - iPXE not supported in the stock firmware
+  - installation performed from a flash drive
+  - flashing not supported
+  - serial not supported in BIOS
+  - power controlled using Sonoff - hard shutdowns can affect the TPM chip
+
+
 ## Usage information
 
 Drive's passphrase: `lukspass`.
