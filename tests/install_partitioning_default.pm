@@ -40,7 +40,7 @@ sub run {
     send_key 'tab';
     type_string 'lukspass';
     send_key 'ret';
-    if (get_var('INSTALL_OVER_EXISTING')) {
+    if (get_var('INSTALL_OVER_EXISTING') or check_screen('installer-reclaim-space-question', 5)) {
         assert_and_click 'installer-reclaim-space-question';
         assert_and_click 'installer-reclaim-delete-all';
         assert_and_click 'installer-reclaim-confirm';
