@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 104,
+      "ypos": 142,
+      "width": 106,
+      "height": 13,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "bootloader",
+    "install-grub-qubes"
+  ]
+}
