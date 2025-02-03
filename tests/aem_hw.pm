@@ -228,32 +228,32 @@ sub clear_tpm_aptio {
 
 sub clear_tpm_hp {
     # enter setup menu
-    assert_screen 'hp_post_delay'
-    send_key 'f10'
+    assert_screen 'hp_post_delay';
+    send_key 'f10';
     # the landing menu
-    assert_screen 'hp_setup_file'
+    assert_screen 'hp_setup_file';
 
     # move to "security" menu (third one)
-    send_key 'right'
-    send_key 'right'
-    assert_screen 'hp_setup_security'
+    send_key 'right';
+    send_key 'right';
+    assert_screen 'hp_setup_security';
 
     # select "system security" option (second from bottom)
-    send_key 'up'
-    send_key 'up'
-    send_key 'ret'
-    assert_screen 'hp_setup_security_system_security'
+    send_key 'up';
+    send_key 'up';
+    send_key 'ret';
+    assert_screen 'hp_setup_security_system_security';
 
     # select "Clear TPM" option and verify its set to "reset"
-    send_key 'up'
-    send_key 'right'
-    assert_screen 'hp_setup_security_system_security_clear_tpm'
+    send_key 'up';
+    send_key 'right';
+    assert_screen 'hp_setup_security_system_security_clear_tpm';
 
     # save changes
-    send_key 'f10'
+    send_key 'f10';
 
     # return to "File" menu, pressing "esc" always lands on "Ignore Changes and Exit"
-    send_key 'esc'
+    send_key 'esc';
 
     # select "Save changes and Exit", which is directly below "Ignore Changes"
     send_key 'down';

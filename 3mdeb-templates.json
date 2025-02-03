@@ -308,6 +308,10 @@
             {
                "value" : "4.17.4-2",
                "key" : "XEN_VER"
+            },
+            {
+               "key": "SKL_VER",
+               "value": "0+fafa02165e58aa275421a65e70ae53aae429050c-1"
             }
          ],
          "description" : "Clear TPM, install AEM packages and setup AEM.",
