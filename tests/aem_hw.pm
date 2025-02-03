@@ -50,7 +50,7 @@ use Data::Dumper;
 # they are generally machine-specific, so don't assume anything
 my $boot_disk;
 my $boot_part;
-if (check_var('MACHINE', 'optiplex') || check_var('MACHINE', 'supermicro')) {
+if (check_var('MACHINE', 'optiplex') || check_var('MACHINE', 'supermicro') || check_var('MACHINE', 'hpt630v1')) {
     $boot_disk = '/dev/sda';
     $boot_part = '/dev/sda1';
 } else {
@@ -60,7 +60,7 @@ if (check_var('MACHINE', 'optiplex') || check_var('MACHINE', 'supermicro')) {
 my $drtm_kind;
 if (check_var('MACHINE', 'optiplex')) {
     $drtm_kind = 'txt';
-} elsif (check_var('MACHINE', 'supermicro')) {
+} elsif (check_var('MACHINE', 'supermicro') or check_var('MACHINE', 'hpt630v1')) {
     $drtm_kind = 'skinit';
 } else {
     die "Don't know DRTM type of '@{[ get_var('MACHINE') ]}' machine!";
@@ -71,6 +71,8 @@ if (check_var('MACHINE', 'optiplex')) {
     $bios_kind = 'seabios';
 } elsif (check_var('MACHINE', 'supermicro')) {
     $bios_kind = 'aptio';
+} elsif (check_var('MACHINE', 'hpt630v1')) {
+    $bios_kind = 'hp_ami';
 } else {
     die "Don't know BIOS type of '@{[ get_var('MACHINE') ]}' machine!";
 }
@@ -146,6 +148,8 @@ sub clear_tpm {
         clear_tpm_seabios();
     } elsif ($bios_kind eq 'aptio') {
         clear_tpm_aptio();
+    } elsif ($bios_kind eq 'hp_ami') {
+        clear_tpm_hp();
     } else {
         die "Unhandled BIOS type in clear_tpm(): '$bios_kind'!";
     }
@@ -220,6 +224,47 @@ sub clear_tpm_aptio {
     send_key 'ret';
 
     # at this point the machine reboots
+}
+
+sub clear_tpm_hp {
+    # enter setup menu
+    assert_screen 'hp_post_delay'
+    send_key 'f10'
+    # the landing menu
+    assert_screen 'hp_setup_file'
+
+    # move to "security" menu (third one)
+    send_key 'right'
+    send_key 'right'
+    assert_screen 'hp_setup_security'
+
+    # select "system security" option (second from bottom)
+    send_key 'up'
+    send_key 'up'
+    send_key 'ret'
+    assert_screen 'hp_setup_security_system_security'
+
+    # select "Clear TPM" option and verify its set to "reset"
+    send_key 'up'
+    send_key 'right'
+    assert_screen 'hp_setup_security_system_security_clear_tpm'
+
+    # save changes
+    send_key 'f10'
+
+    # return to "File" menu, pressing "esc" always lands on "Ignore Changes and Exit"
+    send_key 'esc'
+
+    # select "Save changes and Exit", which is directly below "Ignore Changes"
+    send_key 'down';
+    send_key 'ret';
+    assert_screen 'hp_setup_save_and_exit_confirmation'
+
+    # confirm save and exit
+    send_key 'left';
+    send_key 'ret';
+
+    # machine reboots
 }
 
 sub run_cmd {
