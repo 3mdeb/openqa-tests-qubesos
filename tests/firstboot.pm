@@ -68,7 +68,7 @@ sub run {
     my @luks_needles = ("luks-prompt", "firstboot-not-ready");
     if (check_var('BACKEND', 'generalhw')) {
         push(@luks_needles, "plymouth-text-no-prompt");
-        if (check_var('HEADS', '1') and !check_var("HEADS_DISK_UNLOCK", "1")) {
+        if ((check_var('HEADS', '1') and !check_var("HEADS_DISK_UNLOCK", "1")) or check_var("LUKSPASS_NO_VIDEO_WORKAROUND", "1")) {
             # "plymouth-text-no-prompt" would be whole blank here, so fallback
             # to the old approach with check_screen timeout
             if (!check_screen(\@luks_needles, 180)) {
@@ -172,7 +172,7 @@ sub run {
     $configuring = 1;
 
     assert_screen "firstboot-configuring-templates", 90;
-	
+
     my $timeout = 900;
     if (check_var('INSTALL_TEMPLATES', 'all')) {
         $timeout *= 4;
