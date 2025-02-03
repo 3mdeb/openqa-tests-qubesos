@@ -222,6 +222,10 @@
             {
                "key": "LUKSPASS_NO_VIDEO_WORKAROUND",
                "value": "1"
+            },
+            {
+               "key": "TIMEOUT_SCALE",
+               "value": "5"
             }
          ],
          "backend" : "generalhw",
