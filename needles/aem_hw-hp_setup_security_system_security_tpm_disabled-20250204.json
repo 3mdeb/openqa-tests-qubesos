@@ -1,0 +1,22 @@
+{
+  "area": [
+    {
+      "xpos": 451,
+      "ypos": 215,
+      "width": 74,
+      "height": 16,
+      "type": "match"
+    },
+    {
+      "xpos": 331,
+      "ypos": 120,
+      "width": 144,
+      "height": 17,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "hp_setup_security_system_security_tpm_disabled"
+  ]
+}
