@@ -66,7 +66,6 @@
          "version" : "4.2.3",
          "arch" : "x86_64"
       },
-
       {
          "settings" : [],
          "distri" : "qubesos",
@@ -278,10 +277,48 @@
             {
                "value" : "1",
                "key" : "UEFI"
+            },
+            {
+               "key": "OS_INSTALL_LEGACY",
+               "value": "0"
             }
          ],
          "description" : "Install the system and shut it down.  Separate test suite for clarity.  UEFI=1 is a workaround.",
-         "name" : "installation"
+         "name" : "installation-uefi"
+      },
+      {
+         "settings" : [
+            {
+               "key" : "DO_NOTHING",
+               "value" : "%SKIP_INSTALL%"
+            },
+            {
+               "key" : "HDD_1",
+               "value" : "%ISO%"
+            },
+            {
+               "key" : "INSTALL_TEMPLATES",
+               "value" : "fedora"
+            },
+            {
+               "key" : "ISO",
+               "value" : "Qubes-R%BUILD%-%ARCH%.iso"
+            },
+            {
+               "key" : "ISO_MAXSIZE",
+               "value" : "6910355456"
+            },
+            {
+               "value" : "1",
+               "key" : "UEFI"
+            },
+            {
+               "key": "OS_INSTALL_LEGACY",
+               "value": "1"
+            }
+         ],
+         "description" : "Install the system and shut it down.  Separate test suite for clarity.  UEFI=1 is a workaround.",
+         "name" : "installation-legacy"
       },
       {
          "settings" : [
@@ -312,10 +349,52 @@
             {
                "key": "SKL_VER",
                "value": "0+fafa02165e58aa275421a65e70ae53aae429050c-1"
+            },
+            {
+               "key": "OS_INSTALL_LEGACY",
+               "value": "1"
             }
          ],
          "description" : "Clear TPM, install AEM packages and setup AEM.",
-         "name" : "aem-setup"
+         "name" : "aem-setup-legacy"
+      },
+      {
+         "settings" : [
+            {
+               "key" : "AEM_VER",
+               "value" : "4.2.1-1"
+            },
+            {
+               "value" : "2.13-1",
+               "key" : "GRUB_VER"
+            },
+            {
+               "key" : "PACKAGES_BASE_URL",
+               "value" : "http://192.168.4.32:8000/rpm/"
+            },
+            {
+               "key" : "START_AFTER_TEST",
+               "value" : "installation"
+            },
+            {
+               "value" : "setup",
+               "key" : "TEST_AEM_HW"
+            },
+            {
+               "value" : "4.17.5-5",
+               "key" : "XEN_VER"
+            },
+            {
+               "key": "SKL_VER",
+               "value": "0+fafa02165e58aa275421a65e70ae53aae429050c-1"
+            },
+            {
+               "key": "OS_INSTALL_LEGACY",
+               "value": "0"
+            }
+         ],
+         "description" : "Clear TPM, install AEM packages and setup AEM.",
+         "name" : "aem-setup-uefi"
       },
       {
          "description" : "Check that AEM unsealed secret successfully and dump TPM event log.",
@@ -327,12 +406,34 @@
             {
                "value" : "second-run",
                "key" : "TEST_AEM_HW"
+            },
+            {
+               "key": "OS_INSTALL_LEGACY",
+               "value": "0"
             }
          ],
-         "name" : "aem-second-run"
+         "name" : "aem-second-run-uefi"
       },
       {
-         "name" : "aem-first-run",
+         "description" : "Check that AEM unsealed secret successfully and dump TPM event log.",
+         "settings" : [
+            {
+               "value" : "aem-first-run",
+               "key" : "START_AFTER_TEST"
+            },
+            {
+               "value" : "second-run",
+               "key" : "TEST_AEM_HW"
+            },
+            {
+               "key": "OS_INSTALL_LEGACY",
+               "value": "1"
+            }
+         ],
+         "name" : "aem-second-run-legacy"
+      },
+      {
+         "name" : "aem-first-run-legacy",
          "description" : "Check that AEM sealed secret successfully.",
          "settings" : [
             {
@@ -342,6 +443,28 @@
             {
                "key" : "TEST_AEM_HW",
                "value" : "first-run"
+            },
+            {
+               "key": "OS_INSTALL_LEGACY",
+               "value": "1"
+            }
+         ]
+      },
+      {
+         "name" : "aem-first-run-uefi",
+         "description" : "Check that AEM sealed secret successfully.",
+         "settings" : [
+            {
+               "key" : "START_AFTER_TEST",
+               "value" : "aem-setup"
+            },
+            {
+               "key" : "TEST_AEM_HW",
+               "value" : "first-run"
+            },
+            {
+               "key": "OS_INSTALL_LEGACY",
+               "value": "0"
             }
          ]
       }
