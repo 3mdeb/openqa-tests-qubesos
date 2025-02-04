@@ -369,8 +369,6 @@ sub send_packages {
     my @packages = (
         "anti-evil-maid-$aem_ver.fc37.x86_64.rpm",
         "grub2-common-$grub_ver.fc37.noarch.rpm",
-        "grub2-pc-$grub_ver.fc37.x86_64.rpm",
-        "grub2-pc-modules-$grub_ver.fc37.noarch.rpm",
         "grub2-tools-$grub_ver.fc37.x86_64.rpm",
         "grub2-tools-extra-$grub_ver.fc37.x86_64.rpm",
         "grub2-tools-minimal-$grub_ver.fc37.x86_64.rpm",
@@ -381,6 +379,14 @@ sub send_packages {
         "xen-licenses-$xen_ver.fc37.x86_64.rpm",
         "xen-runtime-$xen_ver.fc37.x86_64.rpm",
     );
+
+    if (check_var('OS_INSTALL_LEGACY', '1')) {
+        push @packages, "grub2-pc-$grub_ver.fc37.x86_64.rpm";
+        push @packages, "grub2-pc-modules-$grub_ver.fc37.noarch.rpm",
+    } elsif (check_var('OS_INSTALL_LEGACY', '0')) {
+        push @packages, "grub2-efi-x64-$grub_ver.fc37.x86_64.rpm";
+        push @packages, "grub2-efi-x64-modules-$grub_ver.fc37.noarch.rpm";
+    }
 
     if ($drtm_kind eq 'skinit') {
         my $skl_ver = get_var('SKL_VER');
