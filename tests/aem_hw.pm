@@ -92,9 +92,15 @@ sub run {
         clear_tpm();
 
         # using this to support re-installing AEM
-        assert_serial 'Welcome to GRUB!|Press enter to boot the selected OS';
+        assert_screen 'bootloader';
+        # assert_serial 'Welcome to GRUB!|Press enter to boot the selected OS';
         send_key 'end';
         send_key 'up';
+        # selects "advanced options"
+        send_key 'ret';
+        # selects xen hypervisor version
+        send_key 'ret';
+        # selects qubes version
         send_key 'ret';
 
         handle_luks_pass();
