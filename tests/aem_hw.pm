@@ -148,7 +148,7 @@ sub run {
 
     # help it finish gracefully
     assert_script_run('sync');
-    assert_script_run('poweroff');
+    assert_script_run('reboot');
     sleep 10;
 }
 
