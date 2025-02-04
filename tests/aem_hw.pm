@@ -409,7 +409,13 @@ sub setup_aem {
 }
 
 sub handle_luks_pass {
-    assert_screen "luks-prompt", timeout => 180;
+    # Workaround for the bug where video signal is missing
+    if(!check_screen "luks-prompt", timeout => 180) {
+        send_key 'esc';
+        send_key 'esc';
+        sleep 5;
+    }
+    assert_screen "luks-prompt", timeout => 30;
     type_string "lukspass\n";
 }
 
