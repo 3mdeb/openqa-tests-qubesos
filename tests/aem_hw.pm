@@ -404,7 +404,10 @@ sub setup_aem {
     # cleanup in case AEM was previously initialized (useful for debugging this test)
     assert_script_run('rm -rf /var/lib/anti-evil-maid/aem');
 
-    assert_script_run("grub2-install $boot_disk");
+    # no need to install grub on EFI installations
+    if (!check_var('OS_INSTALL_LEGACY', '0')) {
+        assert_script_run("grub2-install $boot_disk");
+    }
     assert_script_run('anti-evil-maid-tpm-setup -z');
     assert_script_run("anti-evil-maid-install $boot_part");
 
