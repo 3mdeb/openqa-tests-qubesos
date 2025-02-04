@@ -413,7 +413,10 @@ sub setup_aem {
 
 sub handle_luks_pass {
     # Workaround for the bug where video signal is missing
-    if(!check_screen "luks-prompt", timeout => 180) {
+    for my $i (1..10) {
+        if (check_screen("luks-prompt", timeout => 10)){
+            last;
+        }
         send_key 'esc';
         send_key 'esc';
         sleep 5;
@@ -421,6 +424,7 @@ sub handle_luks_pass {
     assert_screen "luks-prompt", timeout => 30;
     type_string "lukspass\n";
 }
+
 
 sub wait_for_startup {
     assert_screen "login-prompt-user-selected", timeout => 120;
