@@ -48,15 +48,6 @@ use Data::Dumper;
 
 # values of these are likely to match on different hardware, but
 # they are generally machine-specific, so don't assume anything
-my $boot_disk;
-my $boot_part;
-if (check_var('MACHINE', 'optiplex') || check_var('MACHINE', 'supermicro') || check_var('MACHINE', 'hpt630v1')) {
-    $boot_disk = '/dev/sda';
-    $boot_part = '/dev/sda1';
-} else {
-    die "Don't know disk and partition names for '@{[ get_var('MACHINE') ]}' machine!";
-}
-
 my $drtm_kind;
 if (check_var('MACHINE', 'optiplex')) {
     $drtm_kind = 'txt';
@@ -75,6 +66,18 @@ if (check_var('MACHINE', 'optiplex')) {
     $bios_kind = 'hp_ami';
 } else {
     die "Don't know BIOS type of '@{[ get_var('MACHINE') ]}' machine!";
+}
+
+my $boot_disk;
+my $boot_part;
+if (check_var('OS_INSTALL_LEGACY', '1')) {
+    $boot_disk = '/dev/sda';
+    $boot_part = '/dev/sda1';
+} elsif (check_var('OS_INSTALL_LEGACY', '0')) {
+    $boot_disk = '/dev/sda';
+    $boot_part = '/dev/sda2';
+} else {
+    die "Don't know disk and partition names for '@{[ get_var('MACHINE') ]}' machine!";
 }
 
 sub run {
