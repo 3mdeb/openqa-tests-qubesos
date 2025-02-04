@@ -295,7 +295,7 @@
             },
             {
                "key" : "PACKAGES_BASE_URL",
-               "value" : "https://dl.3mdeb.com/rpm/QubesOS/r4.2/current/dom0/fc37/rpm/"
+               "value" : "http://192.168.4.32:8000/rpm/"
             },
             {
                "key" : "START_AFTER_TEST",
@@ -306,7 +306,7 @@
                "key" : "TEST_AEM_HW"
             },
             {
-               "value" : "4.17.4-2",
+               "value" : "4.17.5-5",
                "key" : "XEN_VER"
             },
             {
