@@ -267,13 +267,55 @@ sub clear_tpm_hp {
     # select "Save changes and Exit", which is directly below "Ignore Changes"
     send_key 'down';
     send_key 'ret';
-    assert_screen 'hp_setup_save_and_exit_confirmation'
+    assert_screen 'hp_setup_save_and_exit_confirmation';
 
     # confirm save and exit
     send_key 'left';
     send_key 'ret';
 
     # machine reboots
+
+    # enter setup menu
+    assert_screen 'hp_post_delay';
+    send_key 'f10';
+    # the landing menu
+    assert_screen 'hp_setup_file';
+
+    # move to "security" menu (third one)
+    send_key 'right';
+    send_key 'right';
+    assert_screen 'hp_setup_security';
+
+    # select "system security" option (second from bottom)
+    send_key 'up';
+    send_key 'up';
+    send_key 'ret';
+    assert_screen 'hp_setup_security_system_security';
+
+    # select "TPM State" option and verify its set to "Enabled"
+    send_key 'up';
+    send_key 'up';
+    if (check_screen 'hp_setup_security_system_security_tpm_disabled') {
+        send_key 'right';
+    }
+    assert_screen 'hp_setup_security_system_security_tpm_enabled';
+
+    # save changes
+    send_key 'f10';
+
+    # return to "File" menu, pressing "esc" always lands on "Ignore Changes and Exit"
+    send_key 'esc';
+
+    # select "Save changes and Exit", which is directly below "Ignore Changes"
+    send_key 'down';
+    send_key 'ret';
+    assert_screen 'hp_setup_save_and_exit_confirmation';
+
+    # confirm save and exit
+    send_key 'left';
+    send_key 'ret';
+
+    # reboots
 }
 
 sub run_cmd {
