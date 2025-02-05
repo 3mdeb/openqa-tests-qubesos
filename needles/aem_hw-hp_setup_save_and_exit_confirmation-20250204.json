@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 303,
+      "ypos": 216,
+      "width": 189,
+      "height": 16,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "hp_setup_save_and_exit_confirmation"
+  ]
+}

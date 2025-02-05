@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 145,
+      "ypos": 19,
+      "width": 83,
+      "height": 28,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "hp_setup_security"
+  ]
+}

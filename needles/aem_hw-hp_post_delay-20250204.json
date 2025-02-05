@@ -1,0 +1,22 @@
+{
+  "area": [
+    {
+      "xpos": 426,
+      "ypos": 678,
+      "width": 167,
+      "height": 12,
+      "type": "match"
+    },
+    {
+      "xpos": 496,
+      "ypos": 291,
+      "width": 47,
+      "height": 19,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "hp_post_delay"
+  ]
+}

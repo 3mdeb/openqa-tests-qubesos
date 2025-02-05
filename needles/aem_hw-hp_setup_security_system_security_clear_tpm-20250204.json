@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 236,
+      "ypos": 235,
+      "width": 280,
+      "height": 15,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "hp_setup_security_system_security_clear_tpm"
+  ]
+}

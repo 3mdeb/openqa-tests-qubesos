@@ -1,0 +1,22 @@
+{
+  "area": [
+    {
+      "xpos": 313,
+      "ypos": 9,
+      "width": 104,
+      "height": 12,
+      "type": "match"
+    },
+    {
+      "xpos": 21,
+      "ypos": 24,
+      "width": 55,
+      "height": 21,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "hp_setup_file"
+  ]
+}
