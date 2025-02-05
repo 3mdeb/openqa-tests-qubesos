@@ -336,7 +336,7 @@
             },
             {
                "key" : "START_AFTER_TEST",
-               "value" : "installation"
+               "value" : "installation-legacy"
             },
             {
                "value" : "setup",
@@ -374,7 +374,7 @@
             },
             {
                "key" : "START_AFTER_TEST",
-               "value" : "installation"
+               "value" : "installation-uefi"
             },
             {
                "value" : "setup",
@@ -400,7 +400,7 @@
          "description" : "Check that AEM unsealed secret successfully and dump TPM event log.",
          "settings" : [
             {
-               "value" : "aem-first-run",
+               "value" : "aem-first-run-uefi",
                "key" : "START_AFTER_TEST"
             },
             {
@@ -418,7 +418,7 @@
          "description" : "Check that AEM unsealed secret successfully and dump TPM event log.",
          "settings" : [
             {
-               "value" : "aem-first-run",
+               "value" : "aem-first-run-legacy",
                "key" : "START_AFTER_TEST"
             },
             {
@@ -438,7 +438,7 @@
          "settings" : [
             {
                "key" : "START_AFTER_TEST",
-               "value" : "aem-setup"
+               "value" : "aem-setup-legacy"
             },
             {
                "key" : "TEST_AEM_HW",
@@ -456,7 +456,7 @@
          "settings" : [
             {
                "key" : "START_AFTER_TEST",
-               "value" : "aem-setup"
+               "value" : "aem-setup-uefi"
             },
             {
                "key" : "TEST_AEM_HW",
