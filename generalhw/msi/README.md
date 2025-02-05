@@ -110,3 +110,12 @@ openqa-cli api -X POST isos ISO=Qubes-R4.2.0-rc1-x86_64.iso \
                             BUILD=4.2.0-rc1 \
                             INSTALL_TEMPLATES=fedora
 ```
+
+These settings can be added to `openqa-cli` posting command to specify which
+packages to use. By default the values defined in the settings of the
+`aem-setup` test suite in `3mdeb-templates.json` are used.
+
+* `PACKAGES_BASE_URL` - where to look for AEM-related packages.
+* `AEM_VER` - version of `anti-evil-maid` package
+* `GRUB_VER` - version of `grub2-*` packages
+* `XEN_VER` - version of `xen-*` packages

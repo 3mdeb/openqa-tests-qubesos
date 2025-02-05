@@ -31,8 +31,8 @@ Use "Dependencies" tab to see jobs which are part of the same run.
 #### Parameters
 
 These settings can be added to `openqa-cli` posting command to specify which
-packages to use.  Current default uses
-<https://dl.3mdeb.com/open-source-firmware/QubesOS/trenchboot_aem_v0.3/>.
+packages to use. By default the values defined in the settings of the
+`aem-setup` test suite in `3mdeb-templates.json` are used.
 
 * `PACKAGES_BASE_URL` - where to look for AEM-related packages.
 * `AEM_VER` - version of `anti-evil-maid` package
