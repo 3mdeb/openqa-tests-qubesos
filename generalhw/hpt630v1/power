@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rte_ip=$1
+sonoff_ip=$1
 pikvm_ip=$2
 action=$3
 
@@ -19,7 +19,7 @@ function sonoff_pwr() {
     cmd=$(cut -d "p" -f2 <<< "$cmd" )
     post_params="cmnd=Power $cmd"
     echo "Sending sonoff POST request: $post_params\n"
-    curl -X POST http://192.168.10.157/cm -d "$post_params" && echo "\n"
+    curl -X POST http://${sonoff_ip}/cm -d "$post_params" && echo "\n"
     if  [[ $cmd == "off" ]]; then
         echo "Waiting for $POWER_OFF_DELAY_SECONDS s to let the platform power off completely\n"
         for i in $(seq 1 $POWER_OFF_DELAY_SECONDS); do
@@ -30,16 +30,9 @@ function sonoff_pwr() {
     fi
 }
 
-
 function pikvm_cmd() {
     sshpass -proot \
             ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$pikvm_ip" \
-                "$@"
-}
-
-function rte_cmd() {
-    sshpass -pmeta-rte \
-            ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$rte_ip" \
                 "$@"
 }
 
@@ -100,7 +93,6 @@ function leave()
 for i in {1..10}; do
     # if there was no progress in 5 seconds, give it one more try
     if [ "$i" = 1 ] || [ "$i" = 6 ]; then
-        #rte_cmd rte_ctrl "$action"
         sonoff_pwr $action
     fi
 
