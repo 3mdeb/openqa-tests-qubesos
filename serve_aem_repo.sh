@@ -1,5 +1,11 @@
 #!/bin/bash
 
+
+if [[ -z $1 ]]; then
+    echo "Usage: $0 <repo_directory>"
+    exit 1
+fi
+
 REPO_DIR=$1
 
 key=$(gpg --batch --gen-key 2>&1 <<END

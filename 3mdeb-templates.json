@@ -370,7 +370,7 @@
             },
             {
                "key" : "PACKAGES_BASE_URL",
-               "value" : "http://192.168.4.32:8000/rpm/"
+               "value" : "http://192.168.4.32:8000"
             },
             {
                "key" : "START_AFTER_TEST",
