@@ -117,7 +117,7 @@ sub run {
         if ($drtm_kind eq 'txt') {
             setup_acm();
         }
-        send_packages();
+        add_aem_repository();
         install_packages();
         # XXX: workaround until trousers-changer gets the fix
         assert_script_run "sed -i 's/-o pipefail//' /sbin/tpm_id /sbin/tpm2_id";
@@ -361,57 +361,50 @@ sub setup_skl {
     assert_script_run "sed -i '/sinit_module_list=/s/\\*SINIT\\*\\.BIN/skl.bin/' /etc/grub.d/19_linux_xen_trenchboot";
 }
 
-sub send_packages {
+sub add_aem_repository {
     my $base_url = get_var('PACKAGES_BASE_URL');
+    my $key_file = "RPM-GPG-KEY-aem";
+    my $key_url = "${base_url}/${key_file}";
+    my $repo_definition = "[aem]\\nname = Anti Evil Maid based on TrenchBoot\\nbaseurl = $base_url\\ngpgcheck = 1\\ngpgkey = $key_url\\nenabled=1";
+
+    assert_script_run("sudo printf >/etc/yum.repos.d/aem.repo \'${repo_definition}\'");
+
+    assert_script_run("qvm-run --pass-io sys-net \'curl -L $key_url\' > $key_file");
+    assert_script_run("sudo rpm --import $key_file");
+}
+
+sub get_aem_deps_names {
     my $aem_ver = get_var('AEM_VER');
     my $grub_ver = get_var('GRUB_VER');
     my $xen_ver = get_var('XEN_VER');
     my @packages = (
-        "anti-evil-maid-$aem_ver.fc37.x86_64.rpm",
-        "grub2-common-$grub_ver.fc37.noarch.rpm",
-        "grub2-tools-$grub_ver.fc37.x86_64.rpm",
-        "grub2-tools-extra-$grub_ver.fc37.x86_64.rpm",
-        "grub2-tools-minimal-$grub_ver.fc37.x86_64.rpm",
-        "python3-xen-$xen_ver.fc37.x86_64.rpm",
-        "xen-$xen_ver.fc37.x86_64.rpm",
-        "xen-hypervisor-$xen_ver.fc37.x86_64.rpm",
-        "xen-libs-$xen_ver.fc37.x86_64.rpm",
-        "xen-licenses-$xen_ver.fc37.x86_64.rpm",
-        "xen-runtime-$xen_ver.fc37.x86_64.rpm",
+        "anti-evil-maid-$aem_ver.fc37.x86_64",
+        "grub2-common-$grub_ver.fc37.noarch",
+        "grub2-tools-$grub_ver.fc37.x86_64",
+        "grub2-tools-extra-$grub_ver.fc37.x86_64",
+        "grub2-tools-minimal-$grub_ver.fc37.x86_64",
+        "python3-xen-$xen_ver.fc37.x86_64",
+        "xen-$xen_ver.fc37.x86_64",
+        "xen-hypervisor-$xen_ver.fc37.x86_64",
+        "xen-libs-$xen_ver.fc37.x86_64",
+        "xen-licenses-$xen_ver.fc37.x86_64",
+        "xen-runtime-$xen_ver.fc37.x86_64",
     );
 
     if (check_var('OS_INSTALL_LEGACY', '1')) {
-        push @packages, "grub2-pc-$grub_ver.fc37.x86_64.rpm";
-        push @packages, "grub2-pc-modules-$grub_ver.fc37.noarch.rpm",
+        push @packages, "grub2-pc-$grub_ver.fc37.x86_64";
+        push @packages, "grub2-pc-modules-$grub_ver.fc37.noarch",
     } elsif (check_var('OS_INSTALL_LEGACY', '0')) {
-        push @packages, "grub2-efi-x64-$grub_ver.fc37.x86_64.rpm";
-        push @packages, "grub2-efi-x64-modules-$grub_ver.fc37.noarch.rpm";
+        push @packages, "grub2-efi-x64-$grub_ver.fc37.x86_64";
+        push @packages, "grub2-efi-x64-modules-$grub_ver.fc37.noarch";
     }
 
     if ($drtm_kind eq 'skinit') {
         my $skl_ver = get_var('SKL_VER');
-        push @packages, "secure-kernel-loader-$skl_ver.fc37.x86_64.rpm";
+        push @packages, "secure-kernel-loader-$skl_ver.fc37.x86_64";
     }
 
-    # remove RPMs uploaded by previous runs of the script to not pick them up
-    # in install_packages() later
-    assert_script_run('rm -f *.rpm');
-
-    my @files;
-    for my $i (0 .. $#packages) {
-        my $package = $packages[$i];
-        my $url = "$base_url/$package";
-        if (run_cmd('wget', '-O', $package, $url) != 0) {
-            die "Failed to download '$url'";
-        }
-        push @files, $package;
-    }
-
-    if (run_scp_to_sut(@files) != 0) {
-        die "Failed to send packages to DUT";
-    }
-
-    unlink @files or die "Failed to delete some of downloaded files: $!";
+    return \@packages;
 }
 
 sub install_packages {
@@ -423,16 +416,8 @@ sub install_packages {
         'trousers-changer',
         'tpm-tools',
     );
-    my @to_install_reinstall = (
-        './anti-evil-maid-*.rpm',
-        './python3-xen-*.rpm',
-        './xen-*.rpm',
-        './grub2-*.rpm',
-    );
 
-    if ($drtm_kind eq 'skinit') {
-        push @to_install_reinstall, './secure-kernel-loader-*.rpm';
-    }
+    my @packages = @{get_aem_deps_names()};
 
     assert_script_run("qubes-dom0-update --enablerepo=qubes-dom0-current-testing -qy @extra_deps");
 
@@ -444,8 +429,8 @@ sub install_packages {
     # doing it in one command.  Reinstallation happens first, because it just
     # skips packages which were never installed, potentially saving some time
     # when this gets run initially.
-    assert_script_run("dnf reinstall -qy @to_install_reinstall");
-    assert_script_run("dnf install -qy @to_install_reinstall");
+    assert_script_run("qubes-dom0-update --disablerepo=\"*\" --enablerepo=aem --action=reinstall -y @packages", timeout => 300);
+    assert_script_run("qubes-dom0-update --disablerepo=\"*\" --enablerepo=aem --action=install -y @packages", timeout => 300);
 }
 
 sub setup_aem {
