@@ -98,12 +98,11 @@ sub run {
         assert_screen 'bootloader';
         # assert_serial 'Welcome to GRUB!|Press enter to boot the selected OS';
         send_key 'end';
+        # skip firmware settings on UEFI
+        if (check_var('OS_INSTALL_LEGACY', '0')) {
+            send_key 'up';
+        }
         send_key 'up';
-        # selects "advanced options"
-        send_key 'ret';
-        # selects xen hypervisor version
-        send_key 'ret';
-        # selects qubes version
         send_key 'ret';
 
         handle_luks_pass();
