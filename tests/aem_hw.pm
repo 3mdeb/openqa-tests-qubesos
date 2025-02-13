@@ -144,11 +144,6 @@ sub run {
         # collect event log dump
         assert_script_run('anti-evil-maid-dump-evt-log');
     }
-
-    # help it finish gracefully
-    assert_script_run('sync');
-    assert_script_run('reboot');
-    sleep 10;
 }
 
 sub clear_tpm {
