@@ -120,9 +120,7 @@ sub run {
         install_packages();
         # XXX: workaround until trousers-changer gets the fix
         assert_script_run "sed -i 's/-o pipefail//' /sbin/tpm_id /sbin/tpm2_id";
-        if ($drtm_kind eq 'skinit') {
-            setup_skl();
-        }
+
         setup_aem();
     } elsif (check_var('TEST_AEM_HW', 'first-run')) {
         # first reboot:
@@ -348,11 +346,6 @@ sub setup_acm {
 
     assert_script_run("unzip -o '$zip_fname'");
     assert_script_run("cp --update '$zip_root/$bin_fname' /boot");
-}
-
-sub setup_skl {
-    # XXX: workaround until AEM package learns to pick up SKL
-    assert_script_run "sed -i '/sinit_module_list=/s/\\*SINIT\\*\\.BIN/skl.bin/' /etc/grub.d/19_linux_xen_trenchboot";
 }
 
 sub add_aem_repository {
