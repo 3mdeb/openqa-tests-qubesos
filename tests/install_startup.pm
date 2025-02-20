@@ -87,6 +87,23 @@ sub run {
         heads_boot_usb;
     } elsif (check_var('MACHINE', 'optiplex')) {
         ipxe_boot('dasharo');
+    } elsif (check_var('MACHINE', 'vp4670')) {
+        my $ks_url = get_var('QUBES_OS_KS_URL');
+        my $device_ip = get_var('QUBES_OS_HOST_IP');
+        # Enter boot manager menu
+        assert_serial "to boot directly";
+        send_key "f11";
+
+        # Hardcoded position of drive connected by PiKVM (5th)
+        assert_serial 'select boot device';
+        send_key 'down';
+        send_key 'down';
+        send_key 'down';
+        send_key 'down';
+        send_key 'ret';
+
+        assert_screen 'bootloader';
+        grub_boot_with_kernel_parameters("inst.sshd inst.ks=$ks_url ip=${device_ip}::192.168.10.1:255.255.255.0::enp1s0 bootdev=enp1s0");
     } elsif (check_var('MACHINE', 'supermicro')) {
         # http://<openqa-ip>:8080/iso/     -- mounted ISO image
         # http://<openqa-ip>:8080/ipxe     -- iPXE script
@@ -153,25 +170,11 @@ sub run {
         wait_serial "FS0:", 30;
         type_string "efi\\boot\\ipxe.efi dhcp && chain $openqa_url/ipxe\n";
     } elsif (!check_var('QUBES_OS_KS_URL', '')) {
-        my $ks_url = get_var('QUBES_OS_KS_URL');
-
         # wait for bootloader to appear
+        my $ks_url = get_var('QUBES_OS_KS_URL');
         assert_screen 'bootloader', 30;
 
-        # skip media verification and edit boot parameters
-        # select boot entry without media verification
-        send_key 'up';
-        # start editing it
-        send_key 'e';
-        # go to the line with kernel parameters
-        send_key 'down';
-        send_key 'down';
-        send_key 'down';
-        send_key 'end';
-        # append them
-        type_string " inst.sshd inst.ks=$ks_url";
-        # boot
-        send_key 'f10';
+        grub_boot_with_kernel_parameters("inst.sshd inst.ks=$ks_url");
     }
 
     # wait for the installer welcome screen to appear
@@ -203,6 +206,24 @@ sub run {
         script_run("hwclock -w");
         select_console('installation', await_console=>0);
     }
+}
+
+sub grub_boot_with_kernel_parameters {
+    my $parameters = shift;
+    # skip media verification and edit boot parameters
+    # select boot entry without media verification
+    send_key 'up';
+    # start editing it
+    send_key 'e';
+    # go to the line with kernel parameters
+    send_key 'down';
+    send_key 'down';
+    send_key 'down';
+    send_key 'end';
+    # append them
+    type_string " $parameters";
+    # boot
+    send_key 'f10';
 }
 
 sub ipxe_boot {
