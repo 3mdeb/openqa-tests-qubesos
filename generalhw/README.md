@@ -53,6 +53,18 @@ VNC-based setup for OptiPlex.  New setups should use VNC if possible (see
   - serial not supported in BIOS
   - power controlled using Sonoff - hard shutdowns can affect the TPM chip
 
+* [vp4670](vp4670/README.md)
+
+  - VNC-based
+  - configuration based on optiplex
+  - input is handled by VNC ('kvmd-vnc')
+  - Kickstart configuration is served by openQA server
+  - iPXE supported, but the `/srv/www/openqa/ipxe.pxe` and
+    `/srv/www/openqa/ipxe.pxe` don't boot out of the box
+  - installation is done from a drive mounted via OTG USB by `gadget-control`
+    script
+  - required to configure the network interface for the installation using
+  anaconda boot parameters
 
 ## Usage information
 
