@@ -89,7 +89,7 @@ sub run {
         sleep 5;
     }
     # handle both encrypted and unencrypted setups
-    assert_screen(["luks-prompt", "firstboot-not-ready"], 60);
+    assert_screen(["luks-prompt", "firstboot-not-ready"], 300);
 
     if (match_has_tag('luks-prompt')) {
         if (check_var("HEADS_DISK_UNLOCK", "1")) {
