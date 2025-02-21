@@ -164,3 +164,61 @@ Attempted and failed workarounds:
 2. Adding `sleep 5` after `systemctl start kvmd` in `power` script to let VNC
    recognize that `kvmd` is back up, but there seems to be ~30 second gap anyway
    and `kvmd-vnc` might be attempting connecting `kvmd` when a client connects.
+
+
+### Anaconda can't download `ks.cfg` etc.
+
+PiKVM can emulate an ethernet interface over a USB connection.
+By default it only connects the device with the PiKVM and the traffic is not
+forwarded outside.
+Because of that virtual interface Anaconda can get confused
+and configure the PiKVM as a default gateway which may result in effectively
+losing network connection.
+
+In theory there are three possible fixes, but only the first one worked when
+configuring the VP4670 worker:
+
+#### Configure the network interface via Anaconda kernel parameters
+
+The network connection works if the details of network configuration are passed
+via [Anaconda boot options](https://anaconda-installer.readthedocs.io/en/latest/boot-options.html#ip)
+
+If using grub, modify the used boot entry by appending:
+```
+ip=<device_ip>::<gateway>:<netmask>::<interface> bootdev=<interface>
+```
+Where:
+- <device_ip> - is a static IP address which will be used by the interface. The
+`workers.ini` file already contains a static IP in the `QUBES_OS_HOST_IP`
+setting
+- <gateway> - the default gateway that should be used
+- <netmask> - the network mask of the local network in dotted-decimal notation,
+e.g. 255.255.255.0
+- <interface> - the interface that is connected to the network and should be
+configured and used to download the dependencies
+
+If using iPXE add the same parameters to the `kernel` call in the `ipxe` script.
+
+
+#### Disable the Ethernet over USB feature
+
+In theory the interface should not appear if the feature is not explicitly
+turned on in `/etc/kvmd/override.yaml` or `/etc/kvmd/override.d`. In practice
+it was always present on this one device. If any of the override files contains
+a setting like:
+
+```yaml
+otg:
+    devices:
+        ethernet:
+            enabled: true
+```
+
+It might be worht trying changing `enabled` to `false` or removing the `ethernet`
+branch entirely.
+
+#### Configure traffic forwarding on PiKVM
+
+It should be possible to use the PiKVM network interace to access the openqa
+server and download required files. It was not tested though. Some instructions
+can be found at the [pikvm handguide](https://docs.pikvm.org/usb_ethernet/#routing-via-pikvm)
