@@ -11,7 +11,7 @@ While logged into openQA server (unless you've installed and configured
 Perform installation followed by AEM testing:
 
 ```
-openqa-cli api -X POST isos DISTRI=qubesos VERSION=4.2 ARCH=x86_64 BUILD=4.2.0 FLAVOR=install-iso-optiplex
+openqa-cli api -X POST isos DISTRI=qubesos VERSION=4.2.3 ARCH=x86_64 BUILD=4.2.3 FLAVOR=install-iso-optiplex
 ```
 
 ISO name is generated as `ISO=Qubes-R%BUILD%-%ARCH%.iso`, you should also create

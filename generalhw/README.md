@@ -188,13 +188,13 @@ If using grub, modify the used boot entry by appending:
 ip=<device_ip>::<gateway>:<netmask>::<interface> bootdev=<interface>
 ```
 Where:
-- <device_ip> - is a static IP address which will be used by the interface. The
+- `<device_ip>` - is a static IP address which will be used by the interface. The
 `workers.ini` file already contains a static IP in the `QUBES_OS_HOST_IP`
 setting
-- <gateway> - the default gateway that should be used
-- <netmask> - the network mask of the local network in dotted-decimal notation,
+- `<gateway>` - the default gateway that should be used
+- `<netmask>` - the network mask of the local network in dotted-decimal notation,
 e.g. 255.255.255.0
-- <interface> - the interface that is connected to the network and should be
+- `<interface>` - the interface that is connected to the network and should be
 configured and used to download the dependencies
 
 If using iPXE add the same parameters to the `kernel` call in the `ipxe` script.
@@ -214,7 +214,7 @@ otg:
             enabled: true
 ```
 
-It might be worht trying changing `enabled` to `false` or removing the `ethernet`
+It might be worth trying changing `enabled` to `false` or removing the `ethernet`
 branch entirely.
 
 #### Configure traffic forwarding on PiKVM
