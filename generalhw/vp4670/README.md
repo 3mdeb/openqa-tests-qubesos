@@ -3,6 +3,12 @@
 For details about how this setup works, see
 [../adding-vnc-setup.md](../adding-vnc-setup.md).
 
+### Prepare installation media
+
+Make sure that an OTG drive containing the installation iso is connected to the
+platform using the PiKVM. It can be done using the PiKVM web interface or the
+console according to the instructions [PiKVM docs](https://docs.pikvm.org/msd/).
+
 ### Start the job
 
 While logged into openQA server (unless you've installed and configured
