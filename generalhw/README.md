@@ -217,6 +217,25 @@ otg:
 It might be worth trying changing `enabled` to `false` or removing the `ethernet`
 branch entirely.
 
+The full currently used configuration of the PiKVM can be viewed using `kvmd -m`. On
+the PiKVM connected to the VP4670, worker #8, the configuration shows:
+```
+(...)
+        ethernet:
+            driver: ecm
+            enabled: false
+            host_mac: ''
+            kvm_mac: ''
+            start: true
+(...)
+```
+where the `start: true` value could possibly be a clue to why the interface
+shows up on the DUT.
+
+Additionaly it was tried to disable the `kvmd-otgnet` service using `systemctl`,
+but that hadn't made the additinal Ethernet-over-USB interface to disappear
+on the VP4670.
+
 #### Configure traffic forwarding on PiKVM
 
 It should be possible to use the PiKVM network interace to access the openqa
