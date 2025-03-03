@@ -287,7 +287,7 @@ sub clear_tpm_hp {
     # select "TPM State" option and verify its set to "Enabled"
     send_key 'up';
     send_key 'up';
-    if (check_screen 'hp_setup_security_system_security_tpm_disabled') {
+    if (check_screen('hp_setup_security_system_security_tpm_disabled', timeout => 2)) {
         send_key 'right';
     }
     assert_screen 'hp_setup_security_system_security_tpm_enabled';
