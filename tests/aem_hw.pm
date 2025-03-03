@@ -418,16 +418,17 @@ sub install_packages {
     # when this gets run initially.
     assert_script_run("qubes-dom0-update --disablerepo=\"*\" --enablerepo=aem --action=reinstall -y @packages", timeout => 300);
     assert_script_run("qubes-dom0-update --disablerepo=\"*\" --enablerepo=aem --action=install -y @packages", timeout => 300);
+
+    # Must manually install grub on legacy installations
+    if (check_var('OS_INSTALL_LEGACY', '1')) {
+        assert_script_run("grub2-install $boot_disk");
+    }
 }
 
 sub setup_aem {
     # cleanup in case AEM was previously initialized (useful for debugging this test)
     assert_script_run('rm -rf /var/lib/anti-evil-maid/aem');
 
-    # no need to manually install grub on EFI installations
-    if (!check_var('OS_INSTALL_LEGACY', '0')) {
-        assert_script_run("grub2-install $boot_disk");
-    }
     assert_script_run('anti-evil-maid-tpm-setup -z');
     assert_script_run("anti-evil-maid-install $boot_part");
 
