@@ -415,8 +415,10 @@ sub install_packages {
     # find.  This is why try to do both operations as dnf doesn't seem to allow
     # doing it in one command.  Reinstallation happens first, because it just
     # skips packages which were never installed, potentially saving some time
-    # when this gets run initially.
-    assert_script_run("qubes-dom0-update --disablerepo=\"*\" --enablerepo=aem --action=reinstall -y @packages", timeout => 300);
+    # when this gets run initially.  However, it fails when there are no
+    # packages to reinstall (e.g. when they are in different versions), so it's
+    # return isn't asserted.
+    script_run("qubes-dom0-update --disablerepo=\"*\" --enablerepo=aem --action=reinstall -y @packages", timeout => 300);
     assert_script_run("qubes-dom0-update --disablerepo=\"*\" --enablerepo=aem --action=install -y @packages", timeout => 300);
 
     # Must manually install grub on legacy installations
