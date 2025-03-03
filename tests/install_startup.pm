@@ -172,7 +172,7 @@ sub run {
     } elsif (!check_var('QUBES_OS_KS_URL', '')) {
         # wait for bootloader to appear
         my $ks_url = get_var('QUBES_OS_KS_URL');
-        assert_screen 'bootloader', 30;
+        assert_screen 'bootloader-installer', 30;
 
         grub_boot_with_kernel_parameters("inst.sshd inst.ks=$ks_url");
     }
