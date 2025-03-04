@@ -1,472 +1,378 @@
 {
-   "Products" : [
-      {
-         "version" : "4.2.3",
-         "arch" : "x86_64",
-         "flavor" : "install-iso",
-         "settings" : [],
-         "distri" : "qubesos"
-      },
-      {
-         "flavor" : "install-iso-iommu",
-         "settings" : [],
-         "distri" : "qubesos",
-         "version" : "4.2.3",
-         "arch" : "x86_64"
-      },
-      {
-         "settings" : [],
-         "distri" : "qubesos",
-         "flavor" : "install-iso-hw",
-         "version" : "4.2.3",
-         "arch" : "x86_64"
-      },
-
-      {
-         "settings" : [],
-         "distri" : "qubesos",
-         "flavor" : "install-iso-optiplex-legacy",
-         "version" : "4.2.3",
-         "arch" : "x86_64"
-      },
-      {
-         "settings" : [],
-         "distri" : "qubesos",
-         "flavor" : "install-iso-optiplex-uefi",
-         "version" : "4.2.3",
-         "arch" : "x86_64"
-      },
-
-      {
-         "settings" : [],
-         "distri" : "qubesos",
-         "flavor" : "install-iso-vp4670-legacy",
-         "version" : "4.2.3",
-         "arch" : "x86_64"
-      },
-      {
-         "settings" : [],
-         "distri" : "qubesos",
-         "flavor" : "install-iso-vp4670-uefi",
-         "version" : "4.2.3",
-         "arch" : "x86_64"
-      },
-
-      {
-         "settings" : [],
-         "distri" : "qubesos",
-         "flavor" : "install-iso-hpt630v1-legacy",
-         "version" : "4.2.3",
-         "arch" : "x86_64"
-      },
-      {
-         "settings" : [],
-         "distri" : "qubesos",
-         "flavor" : "install-iso-hpt630v1-uefi",
-         "version" : "4.2.3",
-         "arch" : "x86_64"
-      },
-      {
-         "settings" : [],
-         "distri" : "qubesos",
-         "flavor" : "install-iso-hpt630v2-legacy",
-         "version" : "4.2.3",
-         "arch" : "x86_64"
-      },
-      {
-         "settings" : [],
-         "distri" : "qubesos",
-         "flavor" : "install-iso-hpt630v2-uefi",
-         "version" : "4.2.3",
-         "arch" : "x86_64"
-      }
-
-
-   ],
-   "JobGroups" : [
-      {
-         "template" : "defaults:\n  x86_64:\n    machine: qemu\n    priority: 70\nproducts:\n  qubesos-4.2.3-install-iso-x86_64:\n    distri: qubesos\n    flavor: install-iso\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-iommu-x86_64:\n    distri: qubesos\n    flavor: install-iso-iommu\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-hw-x86_64:\n    distri: qubesos\n    flavor: install-iso-hw\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-optiplex-legacy-x86_64:\n    distri: qubesos\n    flavor: install-iso-optiplex-legacy\n    version: '4.2.3'\n    legacy_boot : 'true'\n  qubesos-4.2.3-install-iso-optiplex-uefi-x86_64:\n    distri: qubesos\n    flavor: install-iso-optiplex-uefi\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-hpt630v1-legacy-x86_64:\n    distri: qubesos\n    flavor: install-iso-hpt630v1-legacy\n    version: '4.2.3'\n    legacy_boot : 'true'\n  qubesos-4.2.3-install-iso-hpt630v1-uefi-x86_64:\n    distri: qubesos\n    flavor: install-iso-hpt630v1-uefi\n    version: '4.2.3'\nscenarios:\n  x86_64:\n    # qubesos-4.2.3-install-iso-x86_64:\n    #   - test-suite\n    # qubesos-4.2.3-install-iso-iommu-x86_64:\n    #   - test-suite:\n    #       machine: qemu-iommu\n    # qubesos-4.2.3-install-iso-hw-x86_64:\n    #   - test-suite:\n    #       machine: msi\n    # qubesos-4.2.3-install-iso-optiplex-legacy-x86_64:\n    #   - installation:\n    #       machine: optiplex\n    #   - aem-setup:\n    #       machine: optiplex\n    #   - aem-first-run:\n    #       machine: optiplex\n    #   - aem-second-run:\n    #       machine: optiplex\n    qubesos-4.2.3-install-iso-hpt630v1-legacy-x86_64:\n        - installation:\n            machine: hpt630v1\n        - aem-setup:\n            machine: hpt630v1\n        - aem-first-run:\n            machine: hpt630v1\n        - aem-second-run:\n            machine: hpt630v1\n",
-         "group_name" : "Qubes"
-      }
-   ],
-   "Machines" : [
-      {
-         "settings" : [
-            {
-               "value" : "80",
-               "key" : "HDDSIZEGB"
-            },
-            {
-               "value" : "e1000e",
-               "key" : "NICMODEL"
-            },
-            {
-               "value" : "mbr",
-               "key" : "PART_TABLE_TYPE"
-            },
-            {
-               "value" : "host,+vmx,+invtsc",
-               "key" : "QEMUCPU"
-            },
-            {
-               "key" : "QEMUCPUS",
-               "value" : "2"
-            },
-            {
-               "key" : "QEMURAM",
-               "value" : "6144"
-            },
-            {
-               "value" : "1",
-               "key" : "QEMU_DISABLE_SNAPSHOTS"
-            },
-            {
-               "key" : "VIRTIO_CONSOLE",
-               "value" : "1"
-            }
-         ],
-         "backend" : "qemu",
-         "name" : "qemu"
-      },
-      {
-         "backend" : "generalhw",
-         "name" : "msi",
-         "settings" : [
-            {
-               "key" : "+WORKER_CLASS",
-               "value" : "generalhw"
-            },
-            {
-               "key" : "ISO_MAXSIZE",
-               "value" : "6900372992"
-            },
-            {
-               "value" : "1",
-               "key" : "UEFI"
-            }
-         ]
-      },
-      {
-         "settings" : [
-            {
-               "key" : "HDDSIZEGB",
-               "value" : "80"
-            },
-            {
-               "key" : "NICMODEL",
-               "value" : "e1000e"
-            },
-            {
-               "value" : "mbr",
-               "key" : "PART_TABLE_TYPE"
-            },
-            {
-               "value" : "host,+vmx,+invtsc",
-               "key" : "QEMUCPU"
-            },
-            {
-               "key" : "QEMUCPUS",
-               "value" : "2"
-            },
-            {
-               "key" : "QEMUMACHINE",
-               "value" : "q35,accel=kvm,kernel-irqchip=split"
-            },
-            {
-               "key" : "QEMURAM",
-               "value" : "6144"
-            },
-            {
-               "value" : "device intel-iommu,intremap=on,caching-mode=on,device-iotlb=on",
-               "key" : "QEMU_APPEND"
-            },
-            {
-               "key" : "QEMU_DISABLE_SNAPSHOTS",
-               "value" : "1"
-            },
-            {
-               "key" : "VIRTIO_CONSOLE",
-               "value" : "1"
-            }
-         ],
-         "backend" : "qemu",
-         "name" : "qemu-iommu"
-      },
-      {
-         "settings" : [
-            {
-               "value" : "optiplex",
-               "key" : "+WORKER_CLASS"
-            }
-         ],
-         "backend" : "generalhw",
-         "name" : "optiplex"
-      },
-      {
-         "settings" : [
-            {
-               "value" : "vp4670",
-               "key" : "+WORKER_CLASS"
-            }
-         ],
-         "backend" : "generalhw",
-         "name" : "vp4670"
-      },
-      {
-         "settings" : [
-            {
-               "value" : "hpt630v1",
-               "key" : "+WORKER_CLASS"
-            },
-            {
-               "key": "LUKSPASS_NO_VIDEO_WORKAROUND",
-               "value": "1"
-            },
-            {
-               "key": "TIMEOUT_SCALE",
-               "value": "5"
-            }
-         ],
-         "backend" : "generalhw",
-         "name" : "hpt630v1"
-      },
-      {
-         "settings" : [
-            {
-               "value" : "hpt630v2",
-               "key" : "+WORKER_CLASS"
-            },
-            {
-               "value" : "0",
-               "key" : "BOOT_MENU"
-            }
-         ],
-         "backend" : "generalhw",
-         "name" : "hpt630v2"
-      }
-   ],
-   "JobTemplates" : [],
-   "TestSuites" : [
-      {
-         "description" : "Test suite for anything you want.",
-         "settings" : [],
-         "name" : "test-suite"
-      },
-      {
-         "settings" : [
-            {
-               "key" : "DO_NOTHING",
-               "value" : "%SKIP_INSTALL%"
-            },
-            {
-               "key" : "HDD_1",
-               "value" : "%ISO%"
-            },
-            {
-               "key" : "INSTALL_TEMPLATES",
-               "value" : "fedora"
-            },
-            {
-               "key" : "ISO",
-               "value" : "Qubes-R%BUILD%-%ARCH%.iso"
-            },
-            {
-               "key" : "ISO_MAXSIZE",
-               "value" : "6910355456"
-            },
-            {
-               "value" : "1",
-               "key" : "UEFI"
-            },
-            {
-               "key": "OS_INSTALL_LEGACY",
-               "value": "0"
-            }
-         ],
-         "description" : "Install the system and shut it down.  Separate test suite for clarity.  UEFI=1 is a workaround.",
-         "name" : "installation-uefi"
-      },
-      {
-         "settings" : [
-            {
-               "key" : "DO_NOTHING",
-               "value" : "%SKIP_INSTALL%"
-            },
-            {
-               "key" : "HDD_1",
-               "value" : "%ISO%"
-            },
-            {
-               "key" : "INSTALL_TEMPLATES",
-               "value" : "fedora"
-            },
-            {
-               "key" : "ISO",
-               "value" : "Qubes-R%BUILD%-%ARCH%.iso"
-            },
-            {
-               "key" : "ISO_MAXSIZE",
-               "value" : "6910355456"
-            },
-            {
-               "value" : "1",
-               "key" : "UEFI"
-            },
-            {
-               "key": "OS_INSTALL_LEGACY",
-               "value": "1"
-            }
-         ],
-         "description" : "Install the system and shut it down.  Separate test suite for clarity.  UEFI=1 is a workaround.",
-         "name" : "installation-legacy"
-      },
-      {
-         "settings" : [
-            {
-               "key" : "AEM_VER",
-               "value" : "4.2.1-1"
-            },
-            {
-               "value" : "2.13-1",
-               "key" : "GRUB_VER"
-            },
-            {
-               "key" : "PACKAGES_BASE_URL",
-               "value" : "http://192.168.4.32:8000/rpm/"
-            },
-            {
-               "key" : "START_AFTER_TEST",
-               "value" : "installation-legacy"
-            },
-            {
-               "value" : "setup",
-               "key" : "TEST_AEM_HW"
-            },
-            {
-               "value" : "4.17.5-5",
-               "key" : "XEN_VER"
-            },
-            {
-               "key": "SKL_VER",
-               "value": "0+fafa02165e58aa275421a65e70ae53aae429050c-1"
-            },
-            {
-               "key": "OS_INSTALL_LEGACY",
-               "value": "1"
-            }
-         ],
-         "description" : "Clear TPM, install AEM packages and setup AEM.",
-         "name" : "aem-setup-legacy"
-      },
-      {
-         "settings" : [
-            {
-               "key" : "AEM_VER",
-               "value" : "4.2.1-1"
-            },
-            {
-               "value" : "2.13-1",
-               "key" : "GRUB_VER"
-            },
-            {
-               "key" : "PACKAGES_BASE_URL",
-               "value" : "http://192.168.4.32:8000"
-            },
-            {
-               "key" : "START_AFTER_TEST",
-               "value" : "installation-uefi"
-            },
-            {
-               "value" : "setup",
-               "key" : "TEST_AEM_HW"
-            },
-            {
-               "value" : "4.17.5-5",
-               "key" : "XEN_VER"
-            },
-            {
-               "key": "SKL_VER",
-               "value": "0+fafa02165e58aa275421a65e70ae53aae429050c-1"
-            },
-            {
-               "key": "OS_INSTALL_LEGACY",
-               "value": "0"
-            }
-         ],
-         "description" : "Clear TPM, install AEM packages and setup AEM.",
-         "name" : "aem-setup-uefi"
-      },
-      {
-         "description" : "Check that AEM unsealed secret successfully and dump TPM event log.",
-         "settings" : [
-            {
-               "value" : "aem-first-run-uefi",
-               "key" : "START_AFTER_TEST"
-            },
-            {
-               "value" : "second-run",
-               "key" : "TEST_AEM_HW"
-            },
-            {
-               "key": "OS_INSTALL_LEGACY",
-               "value": "0"
-            }
-         ],
-         "name" : "aem-second-run-uefi"
-      },
-      {
-         "description" : "Check that AEM unsealed secret successfully and dump TPM event log.",
-         "settings" : [
-            {
-               "value" : "aem-first-run-legacy",
-               "key" : "START_AFTER_TEST"
-            },
-            {
-               "value" : "second-run",
-               "key" : "TEST_AEM_HW"
-            },
-            {
-               "key": "OS_INSTALL_LEGACY",
-               "value": "1"
-            }
-         ],
-         "name" : "aem-second-run-legacy"
-      },
-      {
-         "name" : "aem-first-run-legacy",
-         "description" : "Check that AEM sealed secret successfully.",
-         "settings" : [
-            {
-               "key" : "START_AFTER_TEST",
-               "value" : "aem-setup-legacy"
-            },
-            {
-               "key" : "TEST_AEM_HW",
-               "value" : "first-run"
-            },
-            {
-               "key": "OS_INSTALL_LEGACY",
-               "value": "1"
-            }
-         ]
-      },
-      {
-         "name" : "aem-first-run-uefi",
-         "description" : "Check that AEM sealed secret successfully.",
-         "settings" : [
-            {
-               "key" : "START_AFTER_TEST",
-               "value" : "aem-setup-uefi"
-            },
-            {
-               "key" : "TEST_AEM_HW",
-               "value" : "first-run"
-            },
-            {
-               "key": "OS_INSTALL_LEGACY",
-               "value": "0"
-            }
-         ]
-      }
-   ]
+  "JobGroups": [
+    {
+      "template": "defaults:\n  x86_64:\n    machine: qemu\n    priority: 70\nproducts:\n  qubesos-4.2.3-install-iso-x86_64:\n    distri: qubesos\n    flavor: install-iso\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-iommu-x86_64:\n    distri: qubesos\n    flavor: install-iso-iommu\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-hw-x86_64:\n    distri: qubesos\n    flavor: install-iso-hw\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-optiplex-uefi-x86_64:\n    distri: qubesos\n    flavor: install-iso-optiplex-uefi\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-hpt630v1-legacy-x86_64:\n    distri: qubesos\n    flavor: install-iso-hpt630v1-legacy\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-hpt630v1-uefi-x86_64:\n    distri: qubesos\n    flavor: install-iso-hpt630v1-uefi\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-hpt630v2-legacy-x86_64:\n    distri: qubesos\n    flavor: install-iso-hpt630v2-legacy\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-hpt630v2-uefi-x86_64:\n    distri: qubesos\n    flavor: install-iso-hpt630v2-uefi\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-vp4670-legacy-x86_64:\n    distri: qubesos\n    flavor: install-iso-vp4670-legacy\n    version: '4.2.3'\n  qubesos-4.2.3-install-iso-vp4670-uefi-x86_64:\n    distri: qubesos\n    flavor: install-iso-vp4670-uefi\n    version: '4.2.3'\nscenarios:\n  x86_64:\n    qubesos-4.2.3-install-iso-vp4670-uefi-x86_64:\n      - installation:\n          machine: vp4670\n      #- aem-setup:\n      #    machine: vp4650\n      #- aem-first-run:\n      #    machine: vp4650\n      #- aem-second-run:\n      #    machine: vp4650\n    qubesos-4.2.3-install-iso-hpt630v1-legacy-x86_64:\n      - installation:\n          machine: hpt630v1\n      - aem-setup:\n          machine: hpt630v1\n      - aem-first-run:\n          machine: hpt630v1\n      - aem-second-run:\n          machine: hpt630v1\n    qubesos-4.2.3-install-iso-hpt630v1-uefi-x86_64:\n      - installation:\n          machine: hpt630v1\n      - aem-setup:\n          machine: hpt630v1\n      - aem-first-run:\n          machine: hpt630v1\n      - aem-second-run:\n          machine: hpt630v1\n    qubesos-4.2.3-install-iso-hpt630v2-legacy-x86_64:\n      - installation:\n          machine: hpt630v2\n      - aem-setup:\n          machine: hpt630v2\n      - aem-first-run:\n          machine: hpt630v2\n      - aem-second-run:\n          machine: hpt630v2\n    qubesos-4.2.3-install-iso-hpt630v2-uefi-x86_64:\n      - installation:\n          machine: hpt630v2\n      - aem-setup:\n          machine: hpt630v2\n      - aem-first-run:\n          machine: hpt630v2\n      - aem-second-run:\n          machine: hpt630v2\n    qubesos-4.2.3-install-iso-optiplex-uefi-x86_64:\n      - installation:\n          machine: optiplex\n      - aem-setup:\n          machine: optiplex\n      - aem-first-run:\n          machine: optiplex\n      - aem-second-run:\n          machine: optiplex\n",
+      "group_name": "Qubes"
+    }
+  ],
+  "JobTemplates": [],
+  "Products": [
+    {
+      "arch": "x86_64",
+      "settings": [],
+      "distri": "qubesos",
+      "flavor": "install-iso",
+      "version": "4.2.3"
+    },
+    {
+      "distri": "qubesos",
+      "flavor": "install-iso-iommu",
+      "version": "4.2.3",
+      "arch": "x86_64",
+      "settings": []
+    },
+    {
+      "distri": "qubesos",
+      "flavor": "install-iso-hw",
+      "version": "4.2.3",
+      "arch": "x86_64",
+      "settings": []
+    },
+    {
+      "settings": [
+        {
+          "value": "0",
+          "key": "OS_INSTALL_LEGACY"
+        }
+      ],
+      "arch": "x86_64",
+      "version": "4.2.3",
+      "flavor": "install-iso-optiplex-uefi",
+      "distri": "qubesos"
+    },
+    {
+      "distri": "qubesos",
+      "flavor": "install-iso-vp4670-legacy",
+      "version": "4.2.3",
+      "arch": "x86_64",
+      "settings": [
+        {
+          "key": "OS_INSTALL_LEGACY",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "settings": [
+        {
+          "key": "OS_INSTALL_LEGACY",
+          "value": "1"
+        }
+      ],
+      "arch": "x86_64",
+      "version": "4.2.3",
+      "flavor": "install-iso-hpt630v1-legacy",
+      "distri": "qubesos"
+    },
+    {
+      "version": "4.2.3",
+      "flavor": "install-iso-hpt630v2-legacy",
+      "distri": "qubesos",
+      "settings": [
+        {
+          "value": "1",
+          "key": "OS_INSTALL_LEGACY"
+        }
+      ],
+      "arch": "x86_64"
+    },
+    {
+      "arch": "x86_64",
+      "settings": [
+        {
+          "key": "OS_INSTALL_LEGACY",
+          "value": "1"
+        }
+      ],
+      "distri": "qubesos",
+      "flavor": "install-iso-optiplex-legacy",
+      "version": "4.2"
+    },
+    {
+      "distri": "qubesos",
+      "flavor": "install-iso-hpt630v1-uefi",
+      "version": "4.2.3",
+      "arch": "x86_64",
+      "settings": [
+        {
+          "key": "OS_INSTALL_LEGACY",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "arch": "x86_64",
+      "settings": [
+        {
+          "value": "0",
+          "key": "OS_INSTALL_LEGACY"
+        }
+      ],
+      "distri": "qubesos",
+      "flavor": "install-iso-hpt630v2-uefi",
+      "version": "4.2.3"
+    },
+    {
+      "settings": [
+        {
+          "key": "OS_INSTALL_LEGACY",
+          "value": "0"
+        }
+      ],
+      "arch": "x86_64",
+      "flavor": "install-iso-vp4670-uefi",
+      "version": "4.2.3",
+      "distri": "qubesos"
+    }
+  ],
+  "Machines": [
+    {
+      "backend": "generalhw",
+      "name": "optiplex",
+      "settings": [
+        {
+          "value": "optiplex",
+          "key": "+WORKER_CLASS"
+        }
+      ]
+    },
+    {
+      "settings": [
+        {
+          "key": "+WORKER_CLASS",
+          "value": "hpt630v1"
+        },
+        {
+          "key": "LUKSPASS_NO_VIDEO_WORKAROUND",
+          "value": "1"
+        },
+        {
+          "key": "TIMEOUT_SCALE",
+          "value": "3"
+        }
+      ],
+      "name": "hpt630v1",
+      "backend": "generalhw"
+    },
+    {
+      "backend": "generalhw",
+      "settings": [
+        {
+          "key": "+WORKER_CLASS",
+          "value": "hpt630v2"
+        },
+        {
+          "key": "LUKSPASS_NO_VIDEO_WORKAROUND",
+          "value": "1"
+        },
+        {
+          "key": "TIMEOUT_SCALE",
+          "value": "3"
+        }
+      ],
+      "name": "hpt630v2"
+    },
+    {
+      "name": "qemu",
+      "settings": [
+        {
+          "key": "HDDSIZEGB",
+          "value": "80"
+        },
+        {
+          "value": "e1000e",
+          "key": "NICMODEL"
+        },
+        {
+          "value": "mbr",
+          "key": "PART_TABLE_TYPE"
+        },
+        {
+          "key": "QEMUCPU",
+          "value": "host,+vmx,+invtsc"
+        },
+        {
+          "key": "QEMUCPUS",
+          "value": "2"
+        },
+        {
+          "key": "QEMURAM",
+          "value": "6144"
+        },
+        {
+          "value": "1",
+          "key": "QEMU_DISABLE_SNAPSHOTS"
+        },
+        {
+          "key": "VIRTIO_CONSOLE",
+          "value": "1"
+        }
+      ],
+      "backend": "qemu"
+    },
+    {
+      "backend": "generalhw",
+      "settings": [
+        {
+          "key": "+WORKER_CLASS",
+          "value": "generalhw"
+        },
+        {
+          "value": "6900372992",
+          "key": "ISO_MAXSIZE"
+        },
+        {
+          "key": "UEFI",
+          "value": "1"
+        }
+      ],
+      "name": "msi"
+    },
+    {
+      "backend": "qemu",
+      "name": "qemu-iommu",
+      "settings": [
+        {
+          "value": "80",
+          "key": "HDDSIZEGB"
+        },
+        {
+          "key": "NICMODEL",
+          "value": "e1000e"
+        },
+        {
+          "key": "PART_TABLE_TYPE",
+          "value": "mbr"
+        },
+        {
+          "key": "QEMUCPU",
+          "value": "host,+vmx,+invtsc"
+        },
+        {
+          "key": "QEMUCPUS",
+          "value": "2"
+        },
+        {
+          "key": "QEMUMACHINE",
+          "value": "q35,accel=kvm,kernel-irqchip=split"
+        },
+        {
+          "key": "QEMURAM",
+          "value": "6144"
+        },
+        {
+          "value": "device intel-iommu,intremap=on,caching-mode=on,device-iotlb=on",
+          "key": "QEMU_APPEND"
+        },
+        {
+          "value": "1",
+          "key": "QEMU_DISABLE_SNAPSHOTS"
+        },
+        {
+          "value": "1",
+          "key": "VIRTIO_CONSOLE"
+        }
+      ]
+    },
+    {
+      "backend": "generalhw",
+      "name": "vp4670",
+      "settings": [
+        {
+          "value": "vp4670",
+          "key": "+WORKER_CLASS"
+        },
+        {
+          "key": "NUMDISKS",
+          "value": "3"
+        }
+      ]
+    }
+  ],
+  "TestSuites": [
+    {
+      "description": "Install the system and shut it down.  Separate test suite for clarity.  UEFI=1 is a workaround.",
+      "name": "installation",
+      "settings": [
+        {
+          "key": "INSTALL_TEMPLATES",
+          "value": "fedora"
+        },
+        {
+          "value": "Qubes-R%BUILD%-%ARCH%.iso",
+          "key": "ISO"
+        },
+        {
+          "value": "6910355456",
+          "key": "ISO_MAXSIZE"
+        },
+        {
+          "value": "1",
+          "key": "UEFI"
+        }
+      ]
+    },
+    {
+      "description": "Clear TPM, install AEM packages and setup AEM.",
+      "settings": [
+        {
+          "key": "AEM_VER",
+          "value": "4.2.1-1"
+        },
+        {
+          "value": "2.13-1",
+          "key": "GRUB_VER"
+        },
+        {
+          "key": "PACKAGES_BASE_URL",
+          "value": "http://192.168.4.32:8000"
+        },
+        {
+          "value": "0+7ca56b9a8251ba9c29ff65440c23b82651edb39b-1",
+          "key": "SKL_VER"
+        },
+        {
+          "value": "installation",
+          "key": "START_AFTER_TEST"
+        },
+        {
+          "key": "TEST_AEM_HW",
+          "value": "setup"
+        },
+        {
+          "value": "4.17.5-6",
+          "key": "XEN_VER"
+        }
+      ],
+      "name": "aem-setup"
+    },
+    {
+      "description": "Check that AEM unsealed secret successfully and dump TPM event log.",
+      "name": "aem-second-run",
+      "settings": [
+        {
+          "key": "START_AFTER_TEST",
+          "value": "aem-first-run"
+        },
+        {
+          "value": "second-run",
+          "key": "TEST_AEM_HW"
+        }
+      ]
+    },
+    {
+      "description": "Check that AEM sealed secret successfully.",
+      "name": "aem-first-run",
+      "settings": [
+        {
+          "key": "START_AFTER_TEST",
+          "value": "aem-setup"
+        },
+        {
+          "value": "first-run",
+          "key": "TEST_AEM_HW"
+        }
+      ]
+    }
+  ]
 }
