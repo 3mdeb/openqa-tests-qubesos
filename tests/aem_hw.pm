@@ -458,6 +458,15 @@ sub wait_for_startup {
 }
 
 sub handle_aem_startup {
+    # Workaround for the bug where video signal is missing
+    for my $i (1..10) {
+        if (check_screen("aem-good-secret", timeout => 10)){
+            last;
+        }
+        send_key 'esc';
+        send_key 'esc';
+        sleep 5;
+    }
     assert_screen "aem-good-secret", timeout => 180;
     send_key "ret";
 }
