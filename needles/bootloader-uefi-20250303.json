@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "width": 126,
+      "type": "match",
+      "height": 80,
+      "ypos": 133,
+      "xpos": 100
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-VERSION-4-2",
+    "bootloader-installer"
+  ]
+}
