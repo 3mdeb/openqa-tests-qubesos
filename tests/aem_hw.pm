@@ -51,7 +51,8 @@ use Data::Dumper;
 my $drtm_kind;
 if (check_var('MACHINE', 'optiplex')) {
     $drtm_kind = 'txt';
-} elsif (check_var('MACHINE', 'supermicro') or check_var('MACHINE', 'hpt630v1')) {
+} elsif (check_var('MACHINE', 'supermicro') or check_var('MACHINE', 'hpt630v1')
+         or check_var('MACHINE', 'hpt630v2')) {
     $drtm_kind = 'skinit';
 } else {
     die "Don't know DRTM type of '@{[ get_var('MACHINE') ]}' machine!";
@@ -62,7 +63,7 @@ if (check_var('MACHINE', 'optiplex')) {
     $bios_kind = 'seabios';
 } elsif (check_var('MACHINE', 'supermicro')) {
     $bios_kind = 'aptio';
-} elsif (check_var('MACHINE', 'hpt630v1')) {
+} elsif (check_var('MACHINE', 'hpt630v1') or check_var('MACHINE', 'hpt630v2')) {
     $bios_kind = 'hp_ami';
 } else {
     die "Don't know BIOS type of '@{[ get_var('MACHINE') ]}' machine!";
