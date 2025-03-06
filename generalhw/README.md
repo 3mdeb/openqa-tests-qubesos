@@ -60,7 +60,7 @@ VNC-based setup for OptiPlex.  New setups should use VNC if possible (see
   - input is handled by VNC ('kvmd-vnc')
   - Kickstart configuration is served by openQA server
   - iPXE supported, but the `/srv/www/openqa/ipxe.pxe` and
-    `/srv/www/openqa/ipxe.pxe` don't boot out of the box
+    `/srv/www/openqa/ipxe` don't boot out of the box
   - installation is done from a drive mounted via OTG USB by `gadget-control`
     script
   - required to configure the network interface for the installation using
