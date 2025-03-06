@@ -141,7 +141,28 @@ sub run {
         wait_for_startup();
 
         # collect event log dump
-        assert_script_run('anti-evil-maid-dump-evt-log');
+        assert_script_run('anti-evil-maid-dump-evt-log > /tmp/aem_event.log');
+
+        # check if log has all expected entries
+        if ($drtm_kind eq 'skinit') {
+            assert_script_run('grep "SKINIT" /tmp/aem_event.log');
+            assert_script_run('grep "DLME entry offset" /tmp/aem_event.log');
+            assert_script_run('grep "DLME$" /tmp/aem_event.log');
+        } elsif ($drtm_kind eq 'txt') {
+            # TODO: TXT uses event types instead of names
+        } else {
+            die "Unhandled DRTM kind run(): '$drtm_kind'!";
+        }
+        assert_script_run('grep "Xen\'s command line" /tmp/aem_event.log');
+        assert_script_run('grep "MB module string" /tmp/aem_event.log');
+        assert_script_run('grep "MB module$" /tmp/aem_event.log');
+
+        # check if PCRs match
+        my $pcrs_str = script_output('ls /sys/class/tpm/tpm0/pcr-sha*/1[78] -1');
+        my @pcrs = split ' ', $pcrs_str;
+        for my $pcr (@pcrs) {
+            assert_script_run("grep -wi \$(cat $pcr) /tmp/aem_event.log");
+        }
     }
 }
 
