@@ -51,7 +51,7 @@ VNC-based setup for OptiPlex.  New setups should use VNC if possible (see
   - installation performed from a flash drive
   - flashing not supported
   - serial not supported in BIOS
-  - power controlled using Sonoff - hard shutdowns can affect the TPM chip
+  - power controlled using Sonoff
 
 * [vp4670](vp4670/README.md)
 
