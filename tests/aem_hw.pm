@@ -19,6 +19,7 @@ use base "installedtest";
 use strict;
 use testapi;
 use serial_terminal;
+use networking;
 use utils qw(assert_serial);
 use Data::Dumper;
 
@@ -138,10 +139,16 @@ sub run {
         handle_aem_startup();
         handle_luks_pass();
         assert_screen "aem-secret.txt-sealed", timeout => 60;
-        wait_for_startup();
+
+        # use full init_gui_session - netvm must be running to upload logs
+        $self->init_gui_session;
+        select_root_console();
 
         # collect event log dump
         assert_script_run('anti-evil-maid-dump-evt-log > /tmp/aem_event.log');
+        # store event log in case manual inspection will be needed
+        curl_via_netvm;
+        upload_logs('/tmp/aem_event.log', failok => 1);
 
         # check if log has all expected entries
         if ($drtm_kind eq 'skinit') {
