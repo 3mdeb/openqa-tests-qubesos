@@ -5,8 +5,10 @@ For details about how this setup works, see
 
 ### Start the job
 
-While logged into openQA server (unless you've installed and configured
-`openqa-cli` locally):
+Before installation, set booting from installer as a default option (or at least
+after the currently installed OS). As of March 2025, this has to be performed
+manually, as the flow will be different between UEFI and legacy booting. Fix is
+planned to be included when legacy boot is implemented and tested.
 
 Perform installation followed by AEM testing:
 

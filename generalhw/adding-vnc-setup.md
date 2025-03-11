@@ -189,12 +189,20 @@ systemctl enable --now kvmd-vnc
 
 ### Switch PiKVM to RGB24 video capture format
 
-If needles don't match due to incorrect colors, that's probably because `UYVY`
-format is used (see output of `v4l2-ctl --list-formats`).
+If needles don't match due to incorrect colors (most likely black isn't black
+but very dark shade of gray), that's probably because `UYVY` format is used (see
+output of `v4l2-ctl --list-formats`).
 
 In this case, copy `kvmd.streamer.cmd` part of `/etc/kvmd/main.yaml` to
-`/etc/kvmd/override.yaml` and change `--format=` parameter to `RGB24` and
-`--encoder=` to `cpu`.  This part will look like this:
+`/etc/kvmd/override.yaml` and change `--format=` parameter to `rgb24` and
+`--encoder=` to `cpu`.  Due to [bug in TC358743](https://github.com/raspberrypi/linux/issues/6068),
+red and blue channels will be swapped.  It isn't enough to use `bgr24` - it
+would be properly communicated to the controller, so it will swap the channels
+as well as metadata about used format.  To handle this problem, a new option
+`--format-swap-rgb` has to be added (available since ustreamer v6.8).
+
+Part of `override.yaml` responsible for setting proper video format will look
+like this:
 
 ```yaml
 kvmd:
@@ -202,67 +210,16 @@ kvmd:
         cmd:
             - "/usr/bin/ustreamer"
             # ...
-            - "--format=RGB24"
+            - "--format=rgb24"
             - "--encoder=cpu"
+            - "--format-swap-rgb"
             # ...
 ```
 
+The snippet above only shows modified streamer command options, but all existing
+ones have to be copied as well.
+
 Apply the changes by restarting `kvmd` with `systemctl restart kvmd`.
-
-Now, if colors are completely off now (e.g., red is green), that might be due
-to `RGB` being treated as `BGR` or vice versa.  Need to patch `ustreamer`...
-
-1. Clone [ustreamer].
-2. Checkout tag that correspond to appropriate version, so it should be
-   compatible with the rest of PiKVM.
-3. Apply the following patch:
-
-```patch
-diff --git a/src/ustreamer/encoders/cpu/encoder.c b/src/ustreamer/encoders/cpu/encoder.c
-index 1c20e6b..a56a7f2 100644
---- a/src/ustreamer/encoders/cpu/encoder.c
-+++ b/src/ustreamer/encoders/cpu/encoder.c
-@@ -221,15 +221,29 @@ static void _jpeg_write_scanlines_rgb565(struct jpeg_compress_struct *jpeg, cons
- }
- 
- static void _jpeg_write_scanlines_rgb24(struct jpeg_compress_struct *jpeg, const us_frame_s *frame) {
-+	uint8_t *line_buf;
-+	US_CALLOC(line_buf, frame->width * 3);
-+
- 	const unsigned padding = us_frame_get_padding(frame);
- 	uint8_t *data = frame->data;
- 
- 	while (jpeg->next_scanline < frame->height) {
--		JSAMPROW scanlines[1] = {data};
--		jpeg_write_scanlines(jpeg, scanlines, 1);
-+		uint8_t *ptr = line_buf;
-+
-+		for (unsigned x = 0; x < frame->width; ++x) {
-+			*(ptr++) = data[2];
-+			*(ptr++) = data[1];
-+			*(ptr++) = data[0];
- 
--		data += (frame->width * 3) + padding;
-+			data += 3;
-+		}
-+		data += padding;
-+
-+		JSAMPROW scanlines[1] = {line_buf};
-+		jpeg_write_scanlines(jpeg, scanlines, 1);
- 	}
-+
-+	free(line_buf);
- }
- 
- #define JPEG_OUTPUT_BUFFER_SIZE ((size_t)4096)
-```
-
-4. Compile: `make apps`
-5. Backup original: `cp /usr/bin/ustreamer /usr/bin/ustreamer.bak`
-6. Install modified version: `cp -f src/ustreamer.bin /usr/bin/ustreamer`
-7. Restart the service which executes `ustreamer`: `systemctl restart kvmd`
-
-[ustreamer]: https://github.com/pikvm/ustreamer/
 
 If PiKVM doesn't work after reboot, that means that video can't be captured at
 large resolution in `RGB24` format, so create a service that loads EDID on
