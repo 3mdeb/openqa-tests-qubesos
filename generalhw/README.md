@@ -41,7 +41,7 @@ VNC-based setup for OptiPlex.  New setups should use VNC if possible (see
   - the GRUB image comes with `iPXE.lkrn` which downloads kernel and initrd
     over the network and starts it
 
-* [hp](hp/README.md)
+* [hp t630 TPM 1.2](hpt630v1/README.md)
 
   - VNC-based
   - configuration based on optiplex
