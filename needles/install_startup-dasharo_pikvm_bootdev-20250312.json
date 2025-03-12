@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 303,
+      "ypos": 431,
+      "width": 80,
+      "height": 17,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "dasharo_pikvm_bootdev"
+  ]
+}

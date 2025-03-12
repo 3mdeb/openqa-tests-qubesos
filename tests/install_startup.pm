@@ -94,12 +94,12 @@ sub run {
         assert_serial "to boot directly";
         send_key "f11";
 
-        # Hardcoded position of drive connected by PiKVM (5th)
+        # Select drive connected by PiKVM
         assert_serial 'select boot device';
-        send_key 'down';
-        send_key 'down';
-        send_key 'down';
-        send_key 'down';
+        # Entries depend on type of drive (flash or CD), they are either
+        # 'PiKVM Composite KVM Device' or 'PiKVM CD-ROM Drive XXXX', so needle
+        # is set to match just `PiKVM C`.
+        send_key_until_needlematch('dasharo_pikvm_bootdev', 'down');
         send_key 'ret';
 
         assert_screen 'bootloader';
