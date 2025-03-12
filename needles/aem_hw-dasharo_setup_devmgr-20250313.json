@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 193,
+      "ypos": 316,
+      "width": 147,
+      "height": 21,
+      "type": "match",
+      "margin": 100
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "dasharo_setup_devmgr"
+  ]
+}

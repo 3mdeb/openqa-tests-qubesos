@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 195,
+      "ypos": 148,
+      "width": 633,
+      "height": 450,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "dasharo_device_manager"
+  ]
+}

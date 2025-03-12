@@ -50,7 +50,7 @@ use Data::Dumper;
 # values of these are likely to match on different hardware, but
 # they are generally machine-specific, so don't assume anything
 my $drtm_kind;
-if (check_var('MACHINE', 'optiplex')) {
+if (check_var('MACHINE', 'optiplex') or check_var('MACHINE', 'vp4670')) {
     $drtm_kind = 'txt';
 } elsif (check_var('MACHINE', 'supermicro') or check_var('MACHINE', 'hpt630v1')
          or check_var('MACHINE', 'hpt630v2')) {
@@ -66,6 +66,8 @@ if (check_var('MACHINE', 'optiplex')) {
     $bios_kind = 'aptio';
 } elsif (check_var('MACHINE', 'hpt630v1') or check_var('MACHINE', 'hpt630v2')) {
     $bios_kind = 'hp_ami';
+} elsif (check_var('MACHINE', 'vp4670')) {
+    $bios_kind = 'dasharo_uefi';
 } else {
     die "Don't know BIOS type of '@{[ get_var('MACHINE') ]}' machine!";
 }
@@ -180,6 +182,8 @@ sub clear_tpm {
         clear_tpm_aptio();
     } elsif ($bios_kind eq 'hp_ami') {
         clear_tpm_hp();
+    } elsif ($bios_kind eq 'dasharo_uefi') {
+        clear_tpm_dasharo();
     } else {
         die "Unhandled BIOS type in clear_tpm(): '$bios_kind'!";
     }
@@ -339,6 +343,47 @@ sub clear_tpm_hp {
     # reboots
 }
 
+sub clear_tpm_dasharo {
+    # enter setup menu
+    assert_screen 'dasharo_post_delay';
+    send_key 'delete'; # differs between platforms, maybe use OCR if fast enough?
+    # the landing menu
+    assert_screen 'dasharo_setup';
+
+    # navigate to device manager
+    send_key_until_needlematch('dasharo_setup_devmgr', 'down', 10);
+    send_key 'ret';
+    assert_screen 'dasharo_device_manager';
+
+    # navigate to TCG2 configuration
+    send_key_until_needlematch('dasharo_device_manager_tcg2', 'down', 10);
+    send_key 'ret';
+    assert_screen 'dasharo_tcg2';
+
+    # select TPM2 Operation, position may depend on number of available PCR banks
+    send_key_until_needlematch('dasharo_tpm2_operation', 'up', 10);
+
+    # TPM2_ClearControl + Clear
+    send_key 'ret';
+    send_key 'down';
+    send_key 'down';
+    send_key 'down';
+    send_key 'ret';
+    assert_screen 'dasharo_tpm2_clearcontrol';
+
+    # save, return to main menu and reboot
+    send_key('f10', wait_screen_change => 1);
+    send_key('y', wait_screen_change => 1);
+    send_key('esc', wait_screen_change => 1);
+    send_key('esc', wait_screen_change => 1);
+    send_key('pgdn', wait_screen_change => 1);
+    send_key('ret', wait_screen_change => 1);
+
+    # confirm request to clear TPM
+    assert_screen 'dasharo_tpm2_confirm_clear';
+    send_key('f12');
+}
+
 sub run_cmd {
     print "Executing: `@_`\n";
     my $code = system(@_);
@@ -355,7 +400,7 @@ sub run_scp_to_sut {
 
 sub setup_acm {
     my $url = 'https://cdrdv2.intel.com/v1/dl/getContent/630744';
-    my $zip_root = '630744_003';
+    my $zip_root = '630744_003'; ### FIXME: update to new version, handle optiplex
     my $zip_fname = "$zip_root.zip";
 
     my $bin_fname;

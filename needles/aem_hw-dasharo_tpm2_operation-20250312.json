@@ -1,0 +1,22 @@
+{
+  "area": [
+    {
+      "xpos": 212,
+      "ypos": 278,
+      "width": 330,
+      "height": 21,
+      "type": "match"
+    },
+    {
+      "xpos": 641,
+      "ypos": 219,
+      "width": 178,
+      "height": 65,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "dasharo_tpm2_operation"
+  ]
+}

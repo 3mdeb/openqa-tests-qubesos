@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 236,
+      "ypos": 145,
+      "width": 239,
+      "height": 63,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "dasharo_post_delay"
+  ]
+}
