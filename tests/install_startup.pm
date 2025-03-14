@@ -169,6 +169,25 @@ sub run {
         type_string "fs0:\n";
         wait_serial "FS0:", 30;
         type_string "efi\\boot\\ipxe.efi dhcp && chain $openqa_url/ipxe\n";
+    } elsif (check_var('MACHINE', 'hpt630v1') or check_var('MACHINE', 'hpt630v2')) {
+        my $ks_url = get_required_var('QUBES_OS_KS_URL');
+        assert_screen 'hp_post_delay';
+        send_key 'f9';
+        assert_screen 'hp_bootdev_sel';
+
+        if (check_var('OS_INSTALL_LEGACY', '0')) {
+            send_key_until_needlematch('hp_uefi_pikvm_drive', 'down');
+            send_key 'ret';
+        } elsif (check_var('OS_INSTALL_LEGACY', '1')) {
+            send_key_until_needlematch('hp_pikvm_drive', 'down');
+            send_key 'ret';
+        } else {
+            die "OS_INSTALL_LEGACY not set";
+        }
+
+        assert_screen 'bootloader-installer', 30;
+
+        grub_boot_with_kernel_parameters("inst.sshd inst.ks=$ks_url");
     } elsif (!check_var('QUBES_OS_KS_URL', '')) {
         # wait for bootloader to appear
         my $ks_url = get_var('QUBES_OS_KS_URL');

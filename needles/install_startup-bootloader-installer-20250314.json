@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 18,
+      "ypos": 96,
+      "width": 180,
+      "height": 120,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "bootloader-installer"
+  ]
+}

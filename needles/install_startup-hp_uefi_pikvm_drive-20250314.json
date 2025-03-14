@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 207,
+      "ypos": 252,
+      "width": 110,
+      "height": 21,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "hp_uefi_pikvm_drive"
+  ]
+}
