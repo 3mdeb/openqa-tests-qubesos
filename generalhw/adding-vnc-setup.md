@@ -252,6 +252,15 @@ away, otherwise drop `--now` and reboot):
 systemctl enable --now hdmi-init-edid
 ```
 
+The DUT might need to be rebooted in order for the new configuration
+to be used by its video driver. In the case of a device with RTE you can
+execute:
+
+```
+osfv_cli rte --rte_ip $RTE_IP pwr off
+osfv_cli rte --rte_ip $RTE_IP pwr on
+```
+
 ### Enable and start the worker
 
 ```
