@@ -1,0 +1,29 @@
+{
+  "area": [
+    {
+      "xpos": 306,
+      "ypos": 5,
+      "width": 181,
+      "height": 19,
+      "type": "match"
+    },
+    {
+      "xpos": 328,
+      "ypos": 98,
+      "width": 139,
+      "height": 23,
+      "type": "match"
+    },
+    {
+      "xpos": 145,
+      "ypos": 195,
+      "width": 188,
+      "height": 20,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "hp_bootorder"
+  ]
+}

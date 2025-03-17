@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 279,
+      "ypos": 196,
+      "width": 242,
+      "height": 19,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "hp_usb_after_sata"
+  ]
+}

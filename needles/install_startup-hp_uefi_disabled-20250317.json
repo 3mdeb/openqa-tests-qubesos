@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 135,
+      "ypos": 139,
+      "width": 235,
+      "height": 17,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "hp_uefi_disabled"
+  ]
+}

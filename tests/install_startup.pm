@@ -172,6 +172,49 @@ sub run {
     } elsif (check_var('MACHINE', 'hpt630v1') or check_var('MACHINE', 'hpt630v2')) {
         my $ks_url = get_required_var('QUBES_OS_KS_URL');
         assert_screen 'hp_post_delay';
+        # For legacy, it isn't enough to choose proper boot medium for the
+        # installer, because on next boot platform would attempt booting UEFI
+        # first, which would land in UEFI installer. To make it work, we could
+        # either remove the installer medium (on PiKVM) or disable UEFI booting.
+        # Of course, it must be re-enabled for UEFI installation.
+        send_key 'f10';
+        # the landing menu
+        assert_screen 'hp_setup_file';
+        # Storage -> Boot Order
+        send_key 'right';
+        send_key 'up';
+        send_key 'ret';
+        # checks 'Legacy Boot Sources' too, they may be disabled in Secure Boot
+        assert_screen 'hp_bootorder';
+
+        if (check_var('OS_INSTALL_LEGACY', '0')) {
+            send_key_until_needlematch('hp_uefi_enabled', 'f5');
+        } elsif (check_var('OS_INSTALL_LEGACY', '1')) {
+            send_key_until_needlematch('hp_uefi_disabled', 'f5');
+        } else {
+            die "OS_INSTALL_LEGACY not set";
+        }
+        send_key 'f10';  # accept boot order settings
+
+        # now make USB storage be booted after SATA
+        send_key 'up';
+        send_key 'up';
+        send_key 'ret';
+        assert_screen 'hp_setup_storage';
+        send_key 'down';
+        send_key_until_needlematch('hp_usb_after_sata', 'right');
+        send_key 'f10';  # accept storage options
+
+        # save and reboot
+        send_key 'f10';  # selects 'Save Changes and Exit'
+        send_key 'ret';
+        assert_screen 'hp_setup_save_and_exit_confirmation';
+        # confirm save and exit
+        send_key 'left';
+        send_key 'ret';
+
+        # now select the installer
+        assert_screen 'hp_post_delay';
         send_key 'f9';
         assert_screen 'hp_bootdev_sel';
 
@@ -181,8 +224,6 @@ sub run {
         } elsif (check_var('OS_INSTALL_LEGACY', '1')) {
             send_key_until_needlematch('hp_pikvm_drive', 'down');
             send_key 'ret';
-        } else {
-            die "OS_INSTALL_LEGACY not set";
         }
 
         assert_screen 'bootloader-installer', 30;
