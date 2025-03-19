@@ -85,14 +85,24 @@ sub run {
         }
     } elsif (check_var('HEADS', '1')) {
         heads_boot_usb;
-    } elsif (check_var('MACHINE', 'optiplex')) {
+    } elsif (check_var('MACHINE', 'optiplex') and check_var('OS_INSTALL_LEGACY', '1')) {
         ipxe_boot('dasharo');
-    } elsif (check_var('MACHINE', 'vp4670')) {
+    } elsif (check_var('MACHINE', 'vp4670') or check_var('MACHINE', 'optiplex')) {
         my $ks_url = get_var('QUBES_OS_KS_URL');
-        my $device_ip = get_var('QUBES_OS_HOST_IP');
+        my $params = "inst.sshd inst.ks=$ks_url";
+
+        # VP4670 has multiple network controllers, only use the first one
+        if (check_var('MACHINE', 'vp4670')) {
+            my $device_ip = get_var('QUBES_OS_HOST_IP');
+            $params .= " ip=${device_ip}::192.168.10.1:255.255.255.0::enp1s0 bootdev=enp1s0";
+        }
+
         # Enter boot manager menu
         assert_serial "to boot directly";
-        send_key "f11";
+        # No harm in pressing all the buttons, as long as it isn't setup menu,
+        # esc or return.
+        send_key "f11";  # vp4670
+        send_key "f12";  # optiplex
 
         # Select drive connected by PiKVM
         assert_serial 'select boot device';
@@ -103,7 +113,7 @@ sub run {
         send_key 'ret';
 
         assert_screen 'bootloader';
-        grub_boot_with_kernel_parameters("inst.sshd inst.ks=$ks_url ip=${device_ip}::192.168.10.1:255.255.255.0::enp1s0 bootdev=enp1s0");
+        grub_boot_with_kernel_parameters($params);
     } elsif (check_var('MACHINE', 'supermicro')) {
         # http://<openqa-ip>:8080/iso/     -- mounted ISO image
         # http://<openqa-ip>:8080/ipxe     -- iPXE script
