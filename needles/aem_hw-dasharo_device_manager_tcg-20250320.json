@@ -1,0 +1,15 @@
+{
+  "area": [
+    {
+      "xpos": 195,
+      "ypos": 298,
+      "width": 179,
+      "height": 20,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "dasharo_device_manager_tcg2"
+  ]
+}

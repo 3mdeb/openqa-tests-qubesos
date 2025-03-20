@@ -1,0 +1,22 @@
+{
+  "area": [
+    {
+      "xpos": 192,
+      "ypos": 150,
+      "width": 639,
+      "height": 49,
+      "type": "match"
+    },
+    {
+      "xpos": 195,
+      "ypos": 513,
+      "width": 636,
+      "height": 83,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "dasharo_tcg2"
+  ]
+}
