@@ -356,33 +356,46 @@ sub clear_tpm_dasharo {
     send_key 'ret';
     assert_screen 'dasharo_device_manager';
 
-    # navigate to TCG2 configuration
+    # navigate to TCG(2) configuration
     send_key_until_needlematch('dasharo_device_manager_tcg2', 'down', 10);
     send_key 'ret';
     assert_screen 'dasharo_tcg2';
 
-    # select TPM2 Operation, position may depend on number of available PCR banks
+    # select TPM(2) Operation, position may depend on number of available PCR banks
     send_key_until_needlematch('dasharo_tpm2_operation', 'up', 10);
 
-    # TPM2_ClearControl + Clear
+    # 'TPM2_ClearControl + Clear' is 3 steps down
     send_key 'ret';
     send_key 'down';
     send_key 'down';
-    send_key 'down';
-    send_key 'ret';
-    assert_screen 'dasharo_tpm2_clearcontrol';
+    send_key('down', wait_screen_change => 1);
+    if (match_has_tag('dasharo_tpm12_operation')) {
+        # 'Force TPM Clear, Enable, and Activate' - 6 steps total, 3 left
+        send_key 'down';
+        send_key 'down';
+        send_key('down', wait_screen_change => 1);
+        save_screenshot;
+        send_key 'ret';   # returns directly back to device manager
+    } else {
+        save_screenshot;
+        send_key 'ret';
+        assert_screen 'dasharo_tpm2_clearcontrol';
+        send_key('esc', wait_screen_change => 1);  # go back to device manager
+    }
 
     # save, return to main menu and reboot
     send_key('f10', wait_screen_change => 1);
     send_key('y', wait_screen_change => 1);
     send_key('esc', wait_screen_change => 1);
-    send_key('esc', wait_screen_change => 1);
     send_key('pgdn', wait_screen_change => 1);
     send_key('ret', wait_screen_change => 1);
 
-    # confirm request to clear TPM
-    assert_screen 'dasharo_tpm2_confirm_clear';
-    send_key('f12');
+    # TPM2 only - last match changed for TPM2, but not TPM1.2, so it can be used
+    if (not match_has_tag('dasharo_tpm12_operation')) {
+        # confirm request to clear TPM
+        assert_screen 'dasharo_tpm2_confirm_clear';
+        send_key('f12');
+    }
 }
 
 sub setup_acm {
