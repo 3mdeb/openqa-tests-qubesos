@@ -60,13 +60,13 @@ if (check_var('MACHINE', 'optiplex') or check_var('MACHINE', 'vp4670')) {
 }
 
 my $bios_kind;
-if (check_var('MACHINE', 'optiplex')) {
+if (check_var('MACHINE', 'optiplex') and check_var('OS_INSTALL_LEGACY', '1')) {
     $bios_kind = 'seabios';
 } elsif (check_var('MACHINE', 'supermicro')) {
     $bios_kind = 'aptio';
 } elsif (check_var('MACHINE', 'hpt630v1') or check_var('MACHINE', 'hpt630v2')) {
     $bios_kind = 'hp_ami';
-} elsif (check_var('MACHINE', 'vp4670')) {
+} elsif (check_var('MACHINE', 'vp4670') or check_var('MACHINE', 'optiplex')) {
     $bios_kind = 'dasharo_uefi';
 } else {
     die "Don't know BIOS type of '@{[ get_var('MACHINE') ]}' machine!";
@@ -346,7 +346,8 @@ sub clear_tpm_hp {
 sub clear_tpm_dasharo {
     # enter setup menu
     assert_screen 'dasharo_post_delay';
-    send_key 'delete'; # differs between platforms, maybe use OCR if fast enough?
+    send_key 'delete';  # vp4670
+    send_key 'f2';      # optiplex
     # the landing menu
     assert_screen 'dasharo_setup';
 
