@@ -384,42 +384,19 @@ sub clear_tpm_dasharo {
     send_key('f12');
 }
 
-sub run_cmd {
-    print "Executing: `@_`\n";
-    my $code = system(@_);
-    print "Exit code: $code\n";
-    return $code;
-}
-
-sub run_scp_to_sut {
-    my @cmd = ('sshpass', '-puserpass', 'scp', '-q', '-oStrictHostKeyChecking=no', '-oUserKnownHostsFile=/dev/null');
-    push @cmd, @_[0];
-    push @cmd, "root\@@{[ get_var('QUBES_OS_HOST_IP') ]}:" . @_[1];
-    return run_cmd(@cmd);
-}
-
 sub setup_acm {
-    ### FIXME: handle optiplex
-    my $url = 'https://cdrdv2.intel.com/v1/dl/getContent/630744';
-    my $zip_root = '630744_004';
-    my $zip_fname = "$zip_root.zip";
+    my $url = 'https://dl.3mdeb.com/mirror/intel/acm';
+    my %machine2file = (
+        'optiplex' => 'SNB_IVB_SINIT_20190708_PW.bin',
+        'vp4670'   => 'CFL_SINIT_20221220_PRODUCTION_REL_NT_O1_1.10.1_signed.bin'
+    );
+    my $fname = $machine2file{get_var('MACHINE')};
 
-    if (check_var('MACHINE', 'optiplex')) {
-        die "Intel no longer provides SNB_IVB_SINIT_20190708_PW.bin file :(";
+    if ($fname eq '') {
+        die "Don't know which ACM to use for " . get_var('MACHINE');
     }
 
-    if (run_cmd('wget', '-O', $zip_fname, $url) != 0) {
-        die "Failed to download '$url'";
-    }
-
-    assert_script_run("mkdir -p '/tmp/$zip_root'");
-    if (run_scp_to_sut($zip_fname, "/tmp/$zip_root") != 0) {
-        die "Failed to send ACM to DUT";
-    }
-
-    assert_script_run("cd '/tmp/$zip_root'");
-    assert_script_run("unzip -o '$zip_fname'");
-    assert_script_run("cp --update *.bin /boot");
+    assert_script_run("qvm-run --pass-io sys-net \'curl -L $url/$fname\' > /boot/$fname");
 }
 
 sub add_aem_repository {
