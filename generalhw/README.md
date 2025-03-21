@@ -23,10 +23,8 @@ VNC-based setup for OptiPlex.  New setups should use VNC if possible (see
   - can stop `kvmd` during poweron/poweroff if it interferes with power state
     check
   - input is handled by VNC (`kvmd-vnc`)
-  - Kickstart configuration is served by openQA server
-  - installation is done from HTTP served by openQA that mounts ISO
-  - boots via iPXE which loads full-functional iPXE image that is capable of
-    downloading kernel and initrd from the ISO and start it
+  - Kickstart configuration is served by openQA worker
+  - installation is done from a drive mounted via PiKVM MSD
 
 * [supermicro](supermicro/README.md)
 
@@ -41,28 +39,26 @@ VNC-based setup for OptiPlex.  New setups should use VNC if possible (see
   - the GRUB image comes with `iPXE.lkrn` which downloads kernel and initrd
     over the network and starts it
 
-* [hp t630 TPM 1.2](hpt630v1/README.md)
+* [hp t630](hpt630v1/README.md)
 
   - VNC-based
   - configuration based on optiplex
   - input is handled by VNC (`kvmd-vnc`)
-  - Kickstart configuration is served by openQA server
+  - Kickstart configuration is served by openQA worker
   - iPXE not supported in the stock firmware
-  - installation performed from a flash drive
+  - installation is done from a drive mounted via PiKVM MSD
   - flashing not supported
   - serial not supported in BIOS
-  - power controlled using Sonoff
+  - power controlled using Sonoff, platform is configured to automatically power
+    on after AC loss
 
 * [vp4670](vp4670/README.md)
 
   - VNC-based
   - configuration based on optiplex
   - input is handled by VNC ('kvmd-vnc')
-  - Kickstart configuration is served by openQA server
-  - iPXE supported, but the `/srv/www/openqa/ipxe.pxe` and
-    `/srv/www/openqa/ipxe` don't boot out of the box
-  - installation is done from a drive mounted via OTG USB by `gadget-control`
-    script
+  - Kickstart configuration is served by openQA worker
+  - installation is done from a drive mounted via PiKVM MSD
   - required to configure the network interface for the installation using
   anaconda boot parameters
 
@@ -232,12 +228,12 @@ the PiKVM connected to the VP4670, worker #8, the configuration shows:
 where the `start: true` value could possibly be a clue to why the interface
 shows up on the DUT.
 
-Additionaly it was tried to disable the `kvmd-otgnet` service using `systemctl`,
-but that hadn't made the additinal Ethernet-over-USB interface to disappear
-on the VP4670.
+Additionally it was tried to disable the `kvmd-otgnet` service using
+`systemctl`, but that hadn't made the additional Ethernet-over-USB interface to
+disappear on the VP4670.
 
 #### Configure traffic forwarding on PiKVM
 
-It should be possible to use the PiKVM network interace to access the openqa
+It should be possible to use the PiKVM network interface to access the openQA
 server and download required files. It was not tested though. Some instructions
 can be found at the [pikvm handguide](https://docs.pikvm.org/usb_ethernet/#routing-via-pikvm)

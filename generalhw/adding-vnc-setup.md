@@ -106,18 +106,13 @@ Changes to consider:
  * `flash` can:
   - flash firmware on DUT if necessary
   - mount ISO image to be used for network boot and prepare other related files
-    in `/srv/www/openqa`
+    in a per-job directory that will be served on HTTP server set up by the
+    worker
   - prepare PiKVM to serve as an OTG host
  * `input` can feed input to DUT if VNC isn't used
  * `power` generally deals with RTE and power status, but the latter conflicts
    with PiKVM, so things get a little complex and more complex if VNC isn't
    used
- * `ks.cfg` instructs Anaconda to prepare drive for installation by dropping
-   partitions as the first step when the installer starts, so comment-out that
-   part at first to not wipe the disk while starting testing the configuration
-   (although if you got to `ks.cfg` execution, most things must already be
-   working); the `fdisk` command might also need to be changed to prepare for
-   Qubes installation
 
 Most of IPs are set in worker's configuration but some files for network setup
 *could* have hard-coded IP of openQA or DUT (grep for `192.168`).  There can
@@ -129,6 +124,8 @@ also be a placeholder replaced by `sed` with a real IP address automatically.
 host startup before system installation.  Knowing how you can start the
 installer on a given platform see whether there is already a suitable option
 which might need update of its conditional or add a new one if there isn't.
+This is also where changes to template `ks.cfg` are made for platforms that
+require workarounds.
 
 The `openqa-tests-qubesos` tests distribution is cloned at
 `/var/lib/openqa/share/tests/qubesos/`.
@@ -139,8 +136,8 @@ Workers have numeric IDs which are used to start, stop or identify them.  It's
 `WORKER_CLASS` which defines what kind of tasks will be dispatched to the
 worker.
 
-Configuration for generalhw that uses VNC for input and relise on network
-boot (mostly handled in `install_startup.pm` mentioned above):
+Configuration for generalhw that uses VNC for input and relies on boot from
+PiKVM-mounted media (mostly handled in `install_startup.pm` mentioned above):
 
 ```
 [4]
@@ -166,7 +163,6 @@ GENERAL_HW_POWEROFF_ARGS = 192.168.10.54 192.168.10.215 poff
 GENERAL_HW_SOL_CMD = sol
 GENERAL_HW_SOL_ARGS = 192.168.10.54 13541
 
-QUBES_OS_OPENQA_URL = http://192.168.4.32:8080
 QUBES_OS_HOST_IP = 192.168.10.135
 ```
 
