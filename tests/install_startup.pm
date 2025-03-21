@@ -115,6 +115,7 @@ sub run {
         assert_screen 'bootloader';
         grub_boot_with_kernel_parameters($params);
     } elsif (check_var('MACHINE', 'supermicro')) {
+        # FIXME: use per-worker URLs, don't pollute global ones
         # http://<openqa-ip>:8080/iso/     -- mounted ISO image
         # http://<openqa-ip>:8080/ipxe     -- iPXE script
         # http://<openqa-ip>:8080/ks.cfg   -- KickStart configuration file
@@ -160,6 +161,7 @@ sub run {
 
         # GRUB2 should be booting from iPXE automatically.
     } elsif (check_var('MACHINE', 'supermicro')) { # EFI version, saved for later, never gets executed
+        # FIXME: use per-worker URLs, don't pollute global ones
         # http://<openqa-ip>:8080/iso/     -- mounted ISO image
         # http://<openqa-ip>:8080/ipxe     -- iPXE script
         # http://<openqa-ip>:8080/ks.cfg   -- KickStart configuration file
@@ -307,6 +309,7 @@ sub ipxe_boot {
     #      full-featured version
     my $flavour = shift;
 
+    # FIXME: use per-worker URLs, don't pollute global ones
     # Assumptions:
     #  * http://<openqa-ip>:8080/iso/     -- mounted ISO image
     #  * http://<openqa-ip>:8080/ipxe     -- iPXE script

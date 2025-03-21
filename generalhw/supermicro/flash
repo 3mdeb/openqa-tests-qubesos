@@ -69,13 +69,14 @@ reboot_pikvm
 
 ### Mount ISO and prepare other files accessed over the network ###
 ### =========================================================== ###
+# FIXME: this section must be reworked to use paths specific to worker instead
+# of common ones.
 
 echo "flash: setting up data for network boot"
 
 sudo umount --quiet "$web_dir/iso" || true
 
 mkdir -p "$web_dir/iso"
-ln -fs "$script_dir/ks.cfg" "$web_dir/ks.cfg"
 sed "s/@@OPENQA_IP@@/$openqa_ip/" "$script_dir/ipxe" > "$web_dir/ipxe"
 
 sudo mount -t iso9660 -o ro,nodev,nosuid,noexec "$iso_image" "$web_dir/iso"
