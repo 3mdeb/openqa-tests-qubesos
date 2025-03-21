@@ -3,6 +3,12 @@
 For details about how this setup works, see
 [../adding-vnc-setup.md](../adding-vnc-setup.md).
 
+### Prepare installation media
+
+Make sure that an OTG drive containing the installation iso is connected to the
+platform using the PiKVM. It can be done using the PiKVM web interface or the
+console according to the instructions [PiKVM docs](https://docs.pikvm.org/msd/).
+
 ### Start the job
 
 While logged into openQA server (unless you've installed and configured
@@ -11,11 +17,12 @@ While logged into openQA server (unless you've installed and configured
 Perform installation followed by AEM testing:
 
 ```
-openqa-cli api -X POST isos DISTRI=qubesos VERSION=4.2 ARCH=x86_64 BUILD=4.2.0 FLAVOR=install-iso-optiplex
+openqa-cli api -X POST isos DISTRI=qubesos VERSION=4.2.3 ARCH=x86_64 BUILD=4.2.3 FLAVOR=install-iso-optiplex-uefi
 ```
 
-ISO name is generated as `ISO=Qubes-R%BUILD%-%ARCH%.iso`, you should also create
-a symlink to it in `hdd` directory.  Only Fedora template is going to be
+ISO name is generated as `ISO=Qubes-R%BUILD%-%ARCH%.iso`, but it isn't used.
+It is possible to upload the image to PiKVM as part of the test, but it hasn't
+been implemented for this platform yet.  Only Fedora template is going to be
 installed to make setup faster.
 
 Output like

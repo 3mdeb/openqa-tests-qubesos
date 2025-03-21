@@ -3,12 +3,16 @@
 For details about how this setup works, see
 [../adding-vnc-setup.md](../adding-vnc-setup.md).
 
+### Prepare installation media
+
+Make sure that an OTG drive containing the installation iso is connected to the
+platform using the PiKVM. It can be done using the PiKVM web interface or the
+console according to the instructions [PiKVM docs](https://docs.pikvm.org/msd/).
+
 ### Start the job
 
-Before installation, set booting from installer as a default option (or at least
-after the currently installed OS). As of March 2025, this has to be performed
-manually, as the flow will be different between UEFI and legacy booting. Fix is
-planned to be included when legacy boot is implemented and tested.
+While logged into openQA server (unless you've installed and configured
+`openqa-cli` locally):
 
 Perform installation followed by AEM testing:
 
@@ -16,8 +20,15 @@ Perform installation followed by AEM testing:
 openqa-cli api -X POST isos DISTRI=qubesos VERSION=4.2.3 ARCH=x86_64 BUILD=4.2.3 FLAVOR=install-iso-hpt630v1-uefi
 ```
 
-ISO name is generated as `ISO=Qubes-R%BUILD%-%ARCH%.iso`, you should also create
-a symlink to it in `hdd` directory.  Only Fedora template is going to be
+Use one of these as flavor:
+- `install-iso-hpt630v1-uefi` - UEFI installation, TPM 1.2
+- `install-iso-hpt630v1-legacy` - legacy installation, TPM 1.2
+- `install-iso-hpt630v2-uefi` - UEFI installation, TPM 2.0
+- `install-iso-hpt630v2-legacy` - legacy installation, TPM 2.0
+
+ISO name is generated as `ISO=Qubes-R%BUILD%-%ARCH%.iso`, but it isn't used.
+It is possible to upload the image to PiKVM as part of the test, but it hasn't
+been implemented for this platform yet.  Only Fedora template is going to be
 installed to make setup faster.
 
 Output like
