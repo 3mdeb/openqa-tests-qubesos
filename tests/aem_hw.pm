@@ -364,18 +364,34 @@ sub clear_tpm_dasharo {
     # select TPM(2) Operation, position may depend on number of available PCR banks
     send_key_until_needlematch('dasharo_tpm2_operation', 'up', 10);
 
+    # The popup we're in now is very slow, it is fully reprinted after each
+    # move, and because of serial redirection it is clearly visible that each
+    # line is printed separately. Key presses are sometimes dropped if they
+    # happen too quickly during printing, and wait_screen_change may catch the
+    # change between the lines, before window gets printed in full. Adding a 1s
+    # delay between key presses seems to make navigation reliable.
+
     # 'TPM2_ClearControl + Clear' is 3 steps down
     send_key 'ret';
+    sleep 1;
     send_key 'down';
+    sleep 1;
     send_key 'down';
-    send_key('down', wait_screen_change => 1);
+    sleep 1;
+    send_key 'down';
+    sleep 1;
     if (match_has_tag('dasharo_tpm12_operation')) {
         # 'Force TPM Clear, Enable, and Activate' - 6 steps total, 3 left
         send_key 'down';
+        sleep 1;
         send_key 'down';
-        send_key('down', wait_screen_change => 1);
+        sleep 1;
+        send_key 'down';
+        sleep 1;
         save_screenshot;
-        send_key 'ret';   # returns directly back to device manager
+        # https://github.com/Dasharo/dasharo-issues/issues/1091
+        send_key 'ret';   # returns directly back to device manager - bug?
+        sleep 1;
     } else {
         save_screenshot;
         send_key 'ret';
