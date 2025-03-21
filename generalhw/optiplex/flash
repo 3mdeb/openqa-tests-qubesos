@@ -16,16 +16,6 @@ if [ ! -f "$image" ]; then
     exit 1
 fi
 
-echo "flash: setting up data for network boot"
+image_name=$(basename "$image")
 
-web_dir=/srv/www/openqa
-script_dir=$(dirname "$(readlink -f "$0")")
-openqa_ip=$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')
-
-sudo umount --quiet "$web_dir/iso" || true
-
-mkdir -p "$web_dir/iso"
-ln -fs "$script_dir/ks.cfg" "$web_dir/ks.cfg"
-sed "s/@@OPENQA_IP@@/$openqa_ip/" "$script_dir/ipxe" > "$web_dir/ipxe"
-
-sudo mount -t iso9660 -o ro,nodev,nosuid,noexec "$image" "$web_dir/iso"
+echo "Assuming '$image_name' is already connected on PiKVM side"
