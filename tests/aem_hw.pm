@@ -489,18 +489,7 @@ sub setup_aem {
 }
 
 sub handle_luks_pass {
-    # Workaround for the bug where video signal is missing
-    if (check_var("LUKSPASS_NO_VIDEO_WORKAROUND", "1")) {
-        sleep 15;
-        for my $i (1..10) {
-            if (check_screen("luks-prompt", timeout => 10)){
-                last;
-            }
-            send_key 'esc';
-            send_key 'esc';
-            sleep 5;
-        }
-    }
+    lukspass_no_video_workaround("luks-prompt");
     # AEM boot on Intel platforms can take significant amount of time.
     assert_screen "luks-prompt", timeout => 120;
     type_string "lukspass\n";
@@ -513,20 +502,28 @@ sub wait_for_startup {
 }
 
 sub handle_aem_startup {
-    # Workaround for the bug where video signal is missing
-    if (check_var("LUKSPASS_NO_VIDEO_WORKAROUND", "1")) {
-        sleep 15;
-        for my $i (1..10) {
-            if (check_screen("aem-good-secret", timeout => 10)){
-                last;
-            }
-            send_key 'esc';
-            send_key 'esc';
-            sleep 5;
-        }
-    }
+    lukspass_no_video_workaround("aem-good-secret");
     assert_screen "aem-good-secret", timeout => 180;
     send_key "ret";
+}
+
+# Workaround for the bug where video signal is missing
+sub lukspass_no_video_workaround {
+    my ($needle) = @_;
+
+    if (!check_var("LUKSPASS_NO_VIDEO_WORKAROUND", "1")) {
+        return;
+    }
+
+    sleep 15;
+    for my $i (1..10) {
+        if (check_screen($needle, timeout => 10)) {
+            last;
+        }
+        send_key 'esc';
+        send_key 'esc';
+        sleep 5;
+    }
 }
 
 sub test_flags {
