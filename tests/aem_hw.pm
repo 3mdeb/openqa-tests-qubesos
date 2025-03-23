@@ -501,7 +501,8 @@ sub handle_luks_pass {
             sleep 5;
         }
     }
-    assert_screen "luks-prompt", timeout => 30;
+    # AEM boot on Intel platforms can take significant amount of time.
+    assert_screen "luks-prompt", timeout => 120;
     type_string "lukspass\n";
 }
 
