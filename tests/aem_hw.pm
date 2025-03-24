@@ -521,7 +521,9 @@ sub lukspass_no_video_workaround {
             last;
         }
         send_key 'esc';
-        send_key 'esc';
+        if (!check_screen($needle, timeout => 1)) {
+            send_key 'esc';
+        }
         sleep 5;
     }
 }
