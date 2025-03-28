@@ -152,26 +152,53 @@ sub run {
         curl_via_netvm;
         upload_logs('/tmp/aem_event.log', failok => 1);
 
-        # check if log has all expected entries
-        if ($drtm_kind eq 'skinit') {
-            assert_script_run('grep "SKINIT" /tmp/aem_event.log');
-            assert_script_run('grep "DLME entry offset" /tmp/aem_event.log');
-            assert_script_run('grep "DLME$" /tmp/aem_event.log');
-        } elsif ($drtm_kind eq 'txt') {
-            # TODO: TXT uses event types instead of names
-        } else {
-            die "Unhandled DRTM kind run(): '$drtm_kind'!";
-        }
-        assert_script_run('grep "Xen\'s command line" /tmp/aem_event.log');
-        assert_script_run('grep "MB module string" /tmp/aem_event.log');
-        assert_script_run('grep "MB module$" /tmp/aem_event.log');
+        # check if log has all expected entries and PCRs match expected values
+        check_event_log_completeness('/tmp/aem_event.log');
+    }
+}
 
-        # check if PCRs match
-        my $pcrs_str = script_output('ls /sys/class/tpm/tpm0/pcr-sha*/1[78] -1');
-        my @pcrs = split ' ', $pcrs_str;
-        for my $pcr (@pcrs) {
-            assert_script_run("grep -wi \$(cat $pcr) /tmp/aem_event.log");
-        }
+sub check_event_log_completeness {
+    my ($path) = @_;
+
+    # check if log has all expected entries
+    if ($drtm_kind eq 'skinit') {
+        assert_script_run('grep "SKINIT" ' . $path);
+        assert_script_run('grep "DLME entry offset" ' . $path);
+        assert_script_run('grep "DLME$" ' . $path);
+    } elsif ($drtm_kind eq 'txt') {
+        # TXT uses event types instead of names, there are many more than these,
+        # but their number and order varies between families, check just the
+        # most important, common ones
+        assert_script_run('grep "Event Type: 0x402" ' . $path); # HASH_START
+        assert_script_run('grep "Event Type: 0x404" ' . $path); # MLE_HASH
+        assert_script_run('grep "Event Type: 0x410" ' . $path); # SINIT_PUBKEY_HASH
+    } else {
+        die "Unhandled DRTM kind run(): '$drtm_kind'!";
+    }
+
+    # SLRT, type 0x502 with no `Event` information
+    assert_script_run('grep "Event Type: 0x502" -A5 ' . $path . ' | grep "Event: $"');
+
+    if ($drtm_kind eq 'txt') {
+        assert_script_run('grep "Measured TXT OS-MLE data" ' . $path);
+    }
+
+    if (check_var('OS_INSTALL_LEGACY', '0')) {
+        assert_script_run('grep "Xen\'s command line" ' . $path);
+        assert_script_run('grep "MB module string" ' . $path);
+    } else {
+        # on legacy, the above entries are part of MBI that has type 0x502 and
+        # no `Event`, which makes it the second such entry after SLRT
+        assert_script_run('[ $(grep "Event Type: 0x502" -A5 ' . $path .
+                          ' | grep "Event: $" -c) -eq 2 ]');
+    }
+    assert_script_run('grep "MB module$" ' . $path);
+
+    # check if PCRs match
+    my $pcrs_str = script_output('ls /sys/class/tpm/tpm0/pcr-sha*/1[78] -1');
+    my @pcrs = split ' ', $pcrs_str;
+    for my $pcr (@pcrs) {
+        assert_script_run("grep -wi \$(cat $pcr) " . $path);
     }
 }
 
