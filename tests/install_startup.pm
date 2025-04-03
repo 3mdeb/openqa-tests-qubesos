@@ -85,8 +85,10 @@ sub run {
         }
     } elsif (check_var('HEADS', '1')) {
         heads_boot_usb;
-    } elsif (check_var('MACHINE', 'optiplex') and check_var('OS_INSTALL_LEGACY', '1')) {
-        ipxe_boot('dasharo');
+    } elsif ((check_var('MACHINE', 'optiplex') and check_var('OS_INSTALL_LEGACY', '1')) or
+             (check_var('MACHINE', 'vp4670') and check_var('OS_INSTALL_LEGACY', '1'))) {
+        seabios_boot();
+        #ipxe_boot('dasharo');
     } elsif (check_var('MACHINE', 'vp4670') or check_var('MACHINE', 'optiplex')) {
         my $ks_url = prepare_kickstart_config();
         my $params = "inst.sshd inst.ks=$ks_url";
@@ -112,7 +114,7 @@ sub run {
         send_key_until_needlematch('dasharo_pikvm_bootdev', 'down');
         send_key 'ret';
 
-        assert_screen 'bootloader';
+        assert_screen 'bootloader-installer';
         grub_boot_with_kernel_parameters($params);
     } elsif (check_var('MACHINE', 'supermicro')) {
         # FIXME: use per-worker URLs, don't pollute global ones
@@ -271,7 +273,8 @@ sub run {
         select_console('installation', await_console=>0);
     }
 
-    if (check_var("MACHINE", "hw7") or check_var("MACHINE", "hw12")) {
+    if (check_var("MACHINE", "hw7") or check_var("MACHINE", "hw12") or
+        check_var("MACHINE", "optiplex") or check_var("MACHINE", "vp4670")) {
         select_root_console();
         # RTC battery not connected
         script_run("date -s @" . time());
@@ -287,15 +290,45 @@ sub grub_boot_with_kernel_parameters {
     send_key 'up';
     # start editing it
     send_key 'e';
+    # menu redraws with serial output take too long, some key presses get lost
+    # consider building Dasharo without serial redirection after SeaBIOS
+    sleep 1;
     # go to the line with kernel parameters
     send_key 'down';
+    sleep 1;
     send_key 'down';
+    sleep 1;
     send_key 'down';
+    sleep 1;
     send_key 'end';
-    # append them
-    type_string " $parameters";
+    sleep 1;
+    # append them, somewhat slowly
+    type_string(" $parameters", max_interval => 150);
     # boot
     send_key 'f10';
+}
+
+sub seabios_boot {
+    assert_serial qr/Press ESC for boot menu./, 30;
+    send_key 'esc';
+
+    my $menu = wait_serial qr/TPM Configuration/, 5;
+    diag($menu);
+    $menu =~ /(.)\. USB MSC Drive/;
+    diag($1);
+    send_key $1;
+
+    my $ks_url = prepare_kickstart_config();
+    my $params = "inst.sshd inst.ks=$ks_url";
+
+    # VP4670 has multiple network controllers, only use the first one
+    if (check_var('MACHINE', 'vp4670')) {
+        my $device_ip = get_var('QUBES_OS_HOST_IP');
+        $params .= " ip=${device_ip}::192.168.10.1:255.255.255.0::enp1s0 bootdev=enp1s0";
+    }
+
+    assert_screen 'bootloader-installer';
+    grub_boot_with_kernel_parameters($params);
 }
 
 sub ipxe_boot {

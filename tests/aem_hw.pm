@@ -60,7 +60,8 @@ if (check_var('MACHINE', 'optiplex') or check_var('MACHINE', 'vp4670')) {
 }
 
 my $bios_kind;
-if (check_var('MACHINE', 'optiplex') and check_var('OS_INSTALL_LEGACY', '1')) {
+if ((check_var('MACHINE', 'optiplex') and check_var('OS_INSTALL_LEGACY', '1')) or
+    (check_var('MACHINE', 'vp4670') and check_var('OS_INSTALL_LEGACY', '1'))) {
     $bios_kind = 'seabios';
 } elsif (check_var('MACHINE', 'supermicro')) {
     $bios_kind = 'aptio';
@@ -222,17 +223,20 @@ sub clear_tpm_seabios {
     send_key 'esc';
 
     # enter TPM menu
-    assert_serial 'Select boot device:';
+    assert_serial 't. TPM Configuration';
     send_key 't';
 
-    my $owned = assert_serial qr/Ownership has( not)? been taken/, 5;
-    if (!defined $owned) {
-        die "Failed to check TPM ownership status in TPM menu of SeaBIOS.";
-    } elsif ($owned =~ 'Ownership has not been taken') {
-        # exit TPM menu
+    my $menu = wait_serial qr/reboot the machine./, 5;
+    if (!($menu =~ qr/Ownership has( not)? been taken/)) {
+        # TPM 2.0
+        send_key '1';
+        # poor UX, selecting the option loops back to menu with no feedback
+        send_key 'esc';
+    } elsif ($menu =~ 'Ownership has not been taken') {
+        # TPM 1.2 with ownership not taken, exit TPM menu
         send_key 'esc';
     } else {
-        # reset the TPM, to allow taking ownership
+        # TPM 1.2 with ownership taken, reset the TPM to allow taking ownership
         assert_serial 'c. Clear ownership';
         send_key 'c';
         assert_serial 'e. Enable the TPM';
