@@ -420,16 +420,14 @@ sub clear_tpm_dasharo {
         send_key 'down';
         sleep 1;
         save_screenshot;
-        # Dasharo BUG: https://github.com/Dasharo/dasharo-issues/issues/1091
-        send_key 'ret';   # returns directly back to device manager
-        sleep 1;
+        send_key 'ret';
+        assert_screen 'dasharo_tpm12_clear_enable_activate';
     } else {
         save_screenshot;
         send_key 'ret';
         assert_screen 'dasharo_tpm2_clearcontrol';
-        # TODO: move this outside of conditional after Dasharo BUG is fixed
-        send_key('esc', wait_screen_change => 1);  # go back to device manager
     }
+    send_key('esc', wait_screen_change => 1);  # go back to device manager
 
     # save, return to main menu and reboot
     send_key('f10', wait_screen_change => 1);
@@ -438,13 +436,9 @@ sub clear_tpm_dasharo {
     send_key('pgdn', wait_screen_change => 1);
     send_key('ret', wait_screen_change => 1);
 
-    # TODO: TPM1.2 should take the same path after Dasharo BUG is fixed
-    # TPM2 only - last match changed for TPM2, but not TPM1.2, so it can be used
-    if (not match_has_tag('dasharo_tpm12_operation')) {
-        # confirm request to clear TPM
-        assert_screen 'dasharo_tpm2_confirm_clear';
-        send_key('f12');
-    }
+    # confirm request to clear TPM
+    assert_screen 'dasharo_tpm2_confirm_clear';
+    send_key('f12');
 }
 
 sub setup_acm {
