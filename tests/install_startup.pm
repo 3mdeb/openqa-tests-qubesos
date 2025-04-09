@@ -315,6 +315,10 @@ sub seabios_boot {
     my $menu = wait_serial qr/TPM Configuration/, 5;
     diag($menu);
     $menu =~ /(.)\. USB MSC Drive/;
+    if (!defined($1)) {
+        die "No USB MSC Drive detected";
+    }
+
     diag($1);
     send_key $1;
 
