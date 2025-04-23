@@ -237,7 +237,10 @@ sub clear_tpm_seabios {
         send_key 'esc';
     } else {
         # TPM 1.2 with ownership taken, reset the TPM to allow taking ownership
-        assert_serial 'c. Clear ownership';
+        if (!($menu =~ qr/c. Clear ownership/)) {
+            # Simulate assert_serial output
+            die "Failed to match serial output against regexp /c. Clear ownership/";
+        }
         send_key 'c';
         assert_serial 'e. Enable the TPM';
         send_key 'e';
