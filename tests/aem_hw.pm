@@ -227,6 +227,13 @@ sub clear_tpm_seabios {
     send_key 't';
 
     my $menu = wait_serial qr/reboot the machine./, 5;
+
+    # SeaBIOS spews ANSI Cursor Position code every second, after repeating the
+    # previously printed character. It so happens that it is often inserted in
+    # 'Clear ownership' line, which breaks parsing. Remove that one repeated
+    # character and control sequence to reliably match the line.
+    $menu =~ s/.\e\[\d+;\d+H//g;
+
     if (!($menu =~ qr/Ownership has( not)? been taken/)) {
         # TPM 2.0
         send_key '1';
