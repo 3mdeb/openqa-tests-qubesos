@@ -313,13 +313,15 @@ sub seabios_boot {
     send_key 'esc';
 
     my $menu = wait_serial qr/TPM Configuration/, 5;
-    diag($menu);
+    # SeaBIOS prints ANSI escape code every second (RTC interrupt), log the
+    # output for easier debugging if it happens while the menu is being printed
+    diag("SeaBIOS boot menu:\n" . $menu);
     $menu =~ /(.)\. USB MSC Drive/;
     if (!defined($1)) {
         die "No USB MSC Drive detected";
     }
 
-    diag($1);
+    diag("Booting entry " . $1);
     send_key $1;
 
     my $ks_url = prepare_kickstart_config();
