@@ -161,46 +161,65 @@ sub run {
 sub check_event_log_completeness {
     my ($path) = @_;
 
+    my $soft_fails = 0;
+
+    my sub soft_assert_script_run {
+        my ($script) = @_;
+        my $res = script_run($script);
+        if ($res) {
+            $soft_fails++;
+            record_info("Event log error", "Command '" . $script . "' failed",
+                        result => 'softfail');
+        }
+        return $res;
+    }
+
     # check if log has all expected entries
     if ($drtm_kind eq 'skinit') {
-        assert_script_run('grep "SKINIT" ' . $path);
-        assert_script_run('grep "DLME entry offset" ' . $path);
-        assert_script_run('grep "DLME$" ' . $path);
+        soft_assert_script_run('grep "SKINIT" ' . $path);
+        soft_assert_script_run('grep "DLME entry offset" ' . $path);
+        soft_assert_script_run('grep "DLME$" ' . $path);
     } elsif ($drtm_kind eq 'txt') {
         # TXT uses event types instead of names, there are many more than these,
         # but their number and order varies between families, check just the
         # most important, common ones
-        assert_script_run('grep "Event Type: 0x402" ' . $path); # HASH_START
-        assert_script_run('grep "Event Type: 0x404" ' . $path); # MLE_HASH
-        assert_script_run('grep "Event Type: 0x410" ' . $path); # SINIT_PUBKEY_HASH
+        soft_assert_script_run('grep "Event Type: 0x402" ' . $path); # HASH_START
+        soft_assert_script_run('grep "Event Type: 0x404" ' . $path); # MLE_HASH
+        soft_assert_script_run('grep "Event Type: 0x410" ' . $path); # SINIT_PUBKEY_HASH
     } else {
         die "Unhandled DRTM kind run(): '$drtm_kind'!";
     }
 
     # SLRT, type 0x502 with no `Event` information
-    assert_script_run('grep "Event Type: 0x502" -A5 ' . $path . ' | grep "Event: $"');
+    soft_assert_script_run('grep "Event Type: 0x502" -A5 ' . $path . ' | grep "Event: $"');
 
     if ($drtm_kind eq 'txt') {
-        assert_script_run('grep "Measured TXT OS-MLE data" ' . $path);
+        soft_assert_script_run('grep "Measured TXT OS-MLE data" ' . $path);
     }
 
     if (check_var('OS_INSTALL_LEGACY', '0')) {
-        assert_script_run('grep "Xen\'s command line" ' . $path);
-        assert_script_run('grep "MB module string" ' . $path);
+        soft_assert_script_run('grep "Xen\'s command line" ' . $path);
+        soft_assert_script_run('grep "MB module string" ' . $path);
     } else {
         # on legacy, the above entries are part of MBI that has type 0x502 and
         # no `Event`, which makes it the second such entry after SLRT
-        assert_script_run('[ $(grep "Event Type: 0x502" -A5 ' . $path .
+        soft_assert_script_run('[ $(grep "Event Type: 0x502" -A5 ' . $path .
                           ' | grep "Event: $" -c) -eq 2 ]');
     }
-    assert_script_run('grep "MB module$" ' . $path);
+    soft_assert_script_run('grep "MB module$" ' . $path);
 
     # check if PCRs match
     my $pcrs_str = script_output('ls /sys/class/tpm/tpm0/pcr-sha*/1[78] -1');
     my @pcrs = split ' ', $pcrs_str;
     for my $pcr (@pcrs) {
-        assert_script_run("grep -wi \$(cat $pcr) " . $path);
+        my $res = soft_assert_script_run("grep -wi \$(cat $pcr) " . $path);
+        if ($res and check_var('MACHINE', 'optiplex') and $pcr =~ qr/17$/) {
+            record_info("ACM bug", "Previous error may be caused by bug in Intel ACM");
+            $soft_fails--;
+        }
     }
+
+    die "Event log incomplete or malformed" if $soft_fails;
 }
 
 sub clear_tpm {
