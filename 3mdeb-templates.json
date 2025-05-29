@@ -86,7 +86,7 @@
       ],
       "distri": "qubesos",
       "flavor": "install-iso-optiplex-legacy",
-      "version": "4.2"
+      "version": "4.2.3"
     },
     {
       "distri": "qubesos",
