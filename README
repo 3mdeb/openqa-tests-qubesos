@@ -1,4 +1,4 @@
-OpenQA Tests for Qubes OS
+# OpenQA Tests for Qubes OS
 
 To install, clone this repo to /var/lib/openqa/tests/qubesos
 
@@ -72,3 +72,17 @@ Variables used in tests:
 SecureDrop variables used in tests:
  - `SECUREDROP_INSTALL` - when set to `1`, SecureDrop Workstation is installed
  - `SECUREDROP_TEST` - when set with a value, SecureDrop tests are run on top of an existing installation
+
+## Funding
+
+### TrenchBoot as Anti Evil Maid - UEFI boot mode support
+
+This project is partially funded through [NGI0 Core](https://nlnet.nl/core/) Fund, 
+a fund established by [NLnet](https://nlnet.nl) with financial support from the European Commission's
+ [Next Generation Internet](https://ngi.eu/) programme, under the aegis of [DG Communications Networks, Content and Technology](https://commission.europa.eu/about-european-commission/departments-and-executive-agencies/communications-networks-content-and-technology_en)
+  under grant agreement No [101092990](https://cordis.europa.eu/project/id/101092990).
+
+<p align=center>
+    <a href="https://nlnet.nl"><img src="https://nlnet.nl/logo/banner.png" alt="NLnet foundation logo" height="75" /></a>
+    <a href="https://nlnet.nl/core/"><img src="https://nlnet.nl/image/logos/NGI0Core_tag.svg" alt="NGI Zero Core logo" height="75" /></a>
+</p>
