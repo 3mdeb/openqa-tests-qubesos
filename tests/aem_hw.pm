@@ -487,7 +487,7 @@ sub setup_acm {
 
 sub add_aem_repository {
     my $base_url = get_var('PACKAGES_BASE_URL');
-    my $key_file = "RPM-GPG-KEY-aem";
+    my $key_file = "RPM-GPG-KEY-tb-aem";
     my $key_url = "${base_url}/${key_file}";
     my $repo_definition = "[aem]\\nname = Anti Evil Maid based on TrenchBoot\\nbaseurl = $base_url\\ngpgcheck = 1\\ngpgkey = $key_url\\nenabled=1";
 
