@@ -1,0 +1,9 @@
+#!/bin/bash
+
+rte_ip=$1
+port=$2
+
+# sometimes openQA doesn't kill socat, do it here
+pkill -f "socat -U stdio TCP:$rte_ip:$port"
+
+exec socat -U stdio "TCP:$rte_ip:$port"

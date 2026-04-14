@@ -116,6 +116,30 @@ sub run {
 
         assert_screen 'bootloader-installer';
         grub_boot_with_kernel_parameters($params);
+    } elsif (check_var('MACHINE', 'nuc-box')) {
+        my $ks_url = prepare_kickstart_config();
+
+        # Workarounds for the platform-specific issues described in
+        # [its README](../generalhw/nuc-box/README.md)
+        my $params = "inst.sshd inst.ks=$ks_url i915.force_probe=7dd5 nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off";
+
+        # Entering the boot manager menu directly doesn't work. For this reason
+        # it's needed to enter the Dasharo UI and select One Time Boot instead.
+        # Furthermore, merely pressing F2 once won't work - continuous presses
+        # are needed, otherwise the input might not get recognized.
+        assert_serial "to boot directly";
+        for (my $i = 0; $i <= 30; $i++) {
+            send_key 'f2';
+            sleep(0.25)
+        }
+        assert_screen 'nuc_box_booted_to_dasharo_ui', 30;
+        send_key_until_needlematch('nuc_box_dasharo_ui_selected_one_time_boot', 'down');
+        send_key 'ret';
+        send_key_until_needlematch('nuc_box_dasharo_ui_chosen_pikvm_one_time_boot', 'down');
+        send_key 'ret';
+
+        assert_screen 'bootloader-installer';
+        grub_boot_with_kernel_parameters($params);
     } elsif (check_var('MACHINE', 'supermicro')) {
         # FIXME: use per-worker URLs, don't pollute global ones
         # http://<openqa-ip>:8080/iso/     -- mounted ISO image
@@ -274,7 +298,7 @@ sub run {
     }
 
     if (check_var("MACHINE", "hw7") or check_var("MACHINE", "hw12") or
-        check_var("MACHINE", "optiplex") or check_var("MACHINE", "vp4670")) {
+        check_var("MACHINE", "optiplex") or check_var("MACHINE", "vp4670") or check_var('MACHINE', 'nuc-box')) {
         select_root_console();
         # RTC battery not connected
         script_run("date -s @" . time());
@@ -303,7 +327,7 @@ sub grub_boot_with_kernel_parameters {
     send_key 'end';
     sleep 1;
     # append them, somewhat slowly
-    type_string(" $parameters", max_interval => 150);
+    type_string(" $parameters", max_interval => 10);
     # boot
     send_key 'f10';
 }
@@ -519,6 +543,12 @@ ENDWORKAROUND
 
     # Add workarounds. Platforms not listed in workarounds return empty string
     $ks_cfg =~ s/###PLATFORM_WORKAROUNDS###/$workarounds{get_var('MACHINE')}/;
+
+    # nuc-box has NVMe disk
+    if (check_var('MACHINE', 'nuc-box')) {
+        $ks_cfg =~ s/--only-use=sda/--only-use=nvme0n1/;
+        $ks_cfg =~ s@/dev/sda@/dev/nvme0n1@;
+    }
 
     save_tmp_file('ks.cfg', $ks_cfg);
     return autoinst_url('/files/ks.cfg');

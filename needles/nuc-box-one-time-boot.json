@@ -1,0 +1,15 @@
+{
+  "properties": [],
+  "tags": [
+    "nuc_box_dasharo_ui_selected_one_time_boot"
+  ],
+  "area": [
+    {
+      "xpos": 197,
+      "ypos": 309,
+      "width": 225,
+      "height": 108,
+      "type": "match"
+    }
+  ]
+}

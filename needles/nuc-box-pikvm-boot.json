@@ -1,0 +1,15 @@
+{
+  "properties": [],
+  "tags": [
+    "nuc_box_dasharo_ui_chosen_pikvm_one_time_boot"
+  ],
+  "area": [
+    {
+      "xpos": 634,
+      "ypos": 212,
+      "width": 195,
+      "height": 130,
+      "type": "match"
+    }
+  ]
+}
