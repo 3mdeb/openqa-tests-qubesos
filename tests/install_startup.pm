@@ -114,6 +114,20 @@ sub run {
         send_key_until_needlematch('dasharo_pikvm_bootdev', 'down');
         send_key 'ret';
 
+        assert_screen 'bootloader';
+        grub_boot_with_kernel_parameters($params);
+    } elsif (check_var('MACHINE', 'nuc-box')) {
+        # Custom kickstart to account for nvme0n1, not sda
+        my $ks_url = prepare_kickstart_config_nuc_box();
+        my $params = "inst.sshd inst.ks=$ks_url i915.force_probe=7dd5 nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off";
+
+        # Used to be:
+        # - Enter boot manager menu
+        # - Press F7
+        # - Select drive connected by PiKVM
+        # - Press Enter
+        # This for some reason doesn't work - right now the assumption is that PiKVM's ISO presentation is already set up to be the default boot entry
+
         assert_screen 'bootloader-installer';
         grub_boot_with_kernel_parameters($params);
     } elsif (check_var('MACHINE', 'supermicro')) {
@@ -274,7 +288,7 @@ sub run {
     }
 
     if (check_var("MACHINE", "hw7") or check_var("MACHINE", "hw12") or
-        check_var("MACHINE", "optiplex") or check_var("MACHINE", "vp4670")) {
+        check_var("MACHINE", "optiplex") or check_var("MACHINE", "vp4670") or check_var('MACHINE', 'nuc-box')) {
         select_root_console();
         # RTC battery not connected
         script_run("date -s @" . time());
@@ -303,7 +317,7 @@ sub grub_boot_with_kernel_parameters {
     send_key 'end';
     sleep 1;
     # append them, somewhat slowly
-    type_string(" $parameters", max_interval => 150);
+    type_string(" $parameters", max_interval => 10);
     # boot
     send_key 'f10';
 }
@@ -519,6 +533,98 @@ ENDWORKAROUND
 
     # Add workarounds. Platforms not listed in workarounds return empty string
     $ks_cfg =~ s/###PLATFORM_WORKAROUNDS###/$workarounds{get_var('MACHINE')}/;
+
+    save_tmp_file('ks.cfg', $ks_cfg);
+    return autoinst_url('/files/ks.cfg');
+}
+
+sub prepare_kickstart_config_nuc_box {
+    my $ks_cfg = <<'ENDKS';
+# default settings, to mimic interactive install
+keyboard --vckeymap=us
+timezone --utc UTC
+
+sshpw --username root --plaintext userpass
+
+# by default the installer marks all disks for installation which is undesirable
+# not only due to data removal but also because this can select USB drives which
+# affects configuration related to USB controllers
+ignoredisk --only-use=nvme0n1
+
+%packages
+@^qubes-xfce
+#@debian
+#@whonix
+%end
+
+%pre
+sed -i '/PasswordAuthentication/s!no!yes!' /etc/ssh/sshd_config.anaconda
+systemctl stop sshd.socket
+systemctl stop sshd.service
+systemctl restart anaconda-sshd
+
+# drop partition table
+fdisk /dev/nvme0n1 << FDISK
+o
+w
+FDISK
+
+%end
+
+%post
+
+# enable password root login over SSH
+mkdir -p /etc/ssh/sshd_config.d
+echo 'PermitRootLogin yes' > /etc/ssh/sshd_config.d/30-openqa.conf
+
+# enable SSH on first boot
+cat >/usr/local/bin/post-setup << EOF_POST_SETUP
+#!/bin/sh
+
+set -xe
+
+# allow all USB devices, this setting seems to appear on first boot, hence
+# the update is performed here
+sed -i -e 's/authorized_default=0/authorized_default=1 i915.force_probe=7dd5 nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off/' /boot/grub2/grub.cfg /etc/default/grub
+
+qvm-run -p --nogui -- sys-net nm-online -t 300
+qvm-sync-clock
+sleep 5
+hwclock --systohc --utc
+sleep 5
+date
+qvm-run -p --nogui -- sys-firewall sudo qvm-sync-clock
+sleep 5
+qvm-run -p --nogui -- sys-firewall date
+qubes-dom0-update -y openssh-server
+systemctl enable --now sshd
+printf 'qubes.ConnectTCP +22 sys-net dom0 allow\n' >> /etc/qubes/policy.d/30-openqa.policy
+
+qvm-run --nogui -u root -p sys-net 'cat >>/rw/config/rc.local' << EOF_ALLOW_22
+nft add rule ip qubes custom-input tcp dport ssh accept
+iptables -I INPUT -p tcp --dport 22 -j ACCEPT
+qvm-connect-tcp 22:dom0:22
+EOF_ALLOW_22
+qvm-run --nogui -u root sys-net '/rw/config/rc.local </dev/null &>/dev/null'
+
+systemctl disable post-setup.service
+EOF_POST_SETUP
+chmod +x /usr/local/bin/post-setup
+
+cat >/etc/systemd/system/post-setup.service << EOF_SERVICE
+[Unit]
+After=initial-setup.service
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/post-setup
+[Install]
+WantedBy=multi-user.target
+EOF_SERVICE
+systemctl enable post-setup.service
+echo enable post-setup.service >> /usr/lib/systemd/system-preset/30-openqa.preset
+
+%end
+ENDKS
 
     save_tmp_file('ks.cfg', $ks_cfg);
     return autoinst_url('/files/ks.cfg');

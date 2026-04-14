@@ -133,6 +133,10 @@ sub run {
         script_run "sed -i -e 's/gfxterm/console serial/' /mnt/sysimage/etc/default/grub";
     }
 
+    if (check_var("MACHINE", "nuc-box")) {
+        script_run "sed -i -e 's/console=tty0/console=tty0 i915.force_probe=7dd5 nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off/g' /mnt/sysimage/boot/grub2/grub.cfg /mnt/sysimage/etc/default/grub";
+    }
+
     # log resulting bootloader configuration
     script_run "cat /mnt/sysimage/etc/default/grub $xen_cfg";
     script_run "cat /mnt/sysimage/boot/grub2/grub.cfg /mnt/sysimage/boot/efi/EFI/qubes/grub.cfg";

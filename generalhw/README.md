@@ -62,6 +62,15 @@ VNC-based setup for OptiPlex.  New setups should use VNC if possible (see
   - required to configure the network interface for the installation using
   anaconda boot parameters
 
+* [nuc-box](nuc-box/README.md)
+
+  - VNC-based
+  - toggles `kvmd` after starting/stopping the tests
+  - input is handled by VNC (`kvmd-vnc`)
+  - Kickstart configuration is served by openQA worker
+  - installation is done from a drive mounted via PiKVM MSD
+  - multiple platform-specific workarounds required
+
 ## Usage information
 
 Drive's passphrase: `lukspass`.
