@@ -3,17 +3,6 @@
 For details about how this setup works, see
 [../adding-vnc-setup.md](../adding-vnc-setup.md).
 
-### Prepare installation media
-
-Make sure that an OTG drive containing the installation iso is connected to the
-platform using the PiKVM. It can be done using the PiKVM web interface or the
-console according to the instructions [PiKVM docs](https://docs.pikvm.org/msd/).
-
-Boot into Dasharo UI and make sure that "PiKVM PiKVM Composite Device" is set
-up to be the default boot entry. Save the configuration and only then start the
-job. There's an issue, where openQA can't utilize the one-time boot menu with
-the F7 key, so this step is done manually as of now.
-
 ### Start the job
 
 While logged into openQA server (unless you've installed and configured
@@ -22,13 +11,13 @@ While logged into openQA server (unless you've installed and configured
 Perform installation followed by AEM testing:
 
 ```
-openqa-cli api -X POST isos DISTRI=qubesos VERSION=4.2.3 ARCH=x86_64 BUILD=4.2.3 FLAVOR=install-iso-nuc-box CASEDIR="https://github.com/3mdeb/openqa-tests-qubesos.git" NEEDLES_DIR=%%CASEDIR%%/needles
+openqa-cli api -X POST isos DISTRI=qubesos VERSION=4.2.4 ARCH=x86_64 BUILD=4.2.4 FLAVOR=install-iso-nuc-box CASEDIR="https://github.com/3mdeb/openqa-tests-qubesos.git" NEEDLES_DIR=%%CASEDIR%%/needles
 ```
 
-ISO name is generated as `ISO=Qubes-R%BUILD%-%ARCH%.iso`, and a file with this
-name needs to exist on the openQA worker, but in practice that file goes
-unused. That file could well be empty, and the ISO image PiKVM presents to the
-SUT will be actually used.
+`ISO` and `HDD_1` variables are generated as `Qubes-R%BUILD%-%ARCH%.iso`, and a
+file with this name needs to exist on the openQA worker at
+`/var/lib/openqa/share/factory/{iso,hdd}/` (`hdd` directory can contain a
+symbolic link to the file in `iso` directory to avoid wasting space).
 
 Output like
 

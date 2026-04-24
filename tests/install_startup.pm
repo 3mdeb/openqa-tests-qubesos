@@ -88,7 +88,6 @@ sub run {
     } elsif ((check_var('MACHINE', 'optiplex') and check_var('OS_INSTALL_LEGACY', '1')) or
              (check_var('MACHINE', 'vp4670') and check_var('OS_INSTALL_LEGACY', '1'))) {
         seabios_boot();
-        #ipxe_boot('dasharo');
     } elsif (check_var('MACHINE', 'vp4670') or check_var('MACHINE', 'optiplex')) {
         my $ks_url = prepare_kickstart_config();
         my $params = "inst.sshd inst.ks=$ks_url";
@@ -121,7 +120,9 @@ sub run {
 
         # Workarounds for the platform-specific issues described in
         # [its README](../generalhw/nuc-box/README.md)
-        my $params = "inst.sshd inst.ks=$ks_url i915.force_probe=7dd5 nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off";
+        my $params = "inst.ks=$ks_url i915.force_probe=7dd5 nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off";
+
+        my $ipxe_url = prepare_ipxe_script($params);
 
         # Entering the boot manager menu directly doesn't work. For this reason
         # it's needed to enter the Dasharo UI and select One Time Boot instead.
@@ -135,11 +136,10 @@ sub run {
         assert_screen 'nuc_box_booted_to_dasharo_ui', 30;
         send_key_until_needlematch('nuc_box_dasharo_ui_selected_one_time_boot', 'down');
         send_key 'ret';
-        send_key_until_needlematch('nuc_box_dasharo_ui_chosen_pikvm_one_time_boot', 'down');
+        send_key_until_needlematch('nuc_box_dasharo_ui_chosen_ipxe_one_time_boot', 'down');
         send_key 'ret';
 
-        assert_screen 'bootloader-installer';
-        grub_boot_with_kernel_parameters($params);
+        ipxe_boot('dasharo', $ipxe_url);
     } elsif (check_var('MACHINE', 'supermicro')) {
         # FIXME: use per-worker URLs, don't pollute global ones
         # http://<openqa-ip>:8080/iso/     -- mounted ISO image
@@ -371,20 +371,21 @@ sub ipxe_boot {
     #    - iPXE is not capable of booting QubesOS, need to chain into a
     #      full-featured version
     my $flavour = shift;
+    # iPXE boot script.
+    my $ipxe_url = shift;
 
-    # FIXME: use per-worker URLs, don't pollute global ones
-    # Assumptions:
-    #  * http://<openqa-ip>:8080/iso/     -- mounted ISO image
-    #  * http://<openqa-ip>:8080/ipxe     -- iPXE script
-    #  * http://<openqa-ip>:8080/ipxe.pxe -- full-featured iPXE binary in PXE format
-    #  * http://<openqa-ip>:8080/ks.cfg   -- KickStart configuration file
-    my $openqa_url = get_var('QUBES_OS_OPENQA_URL');
+    if ($flavour ne 'dasharo') {
+        # Assumption:
+        #     Full-featured iPXE binary in PXE format is available at
+        #     `$QUBES_OS_OPENQA_URL/ipxe.pxe`.
+        my $openqa_url = get_var('QUBES_OS_OPENQA_URL');
 
-    # download and start a full-featured iPXE binary in PXE format
-    run_ipxe_chain($flavour, "$openqa_url/ipxe.pxe");
+        # download and start a full-featured iPXE binary in PXE format
+        run_ipxe_chain($flavour, "$openqa_url/ipxe.pxe");
+    }
 
     # start QubesOS by processing instructions from iPXE script file
-    run_ipxe_chain($flavour, "$openqa_url/ipxe");
+    run_ipxe_chain($flavour, $ipxe_url);
 }
 
 sub run_ipxe_chain {
@@ -393,30 +394,30 @@ sub run_ipxe_chain {
     # parameter of the chain command
     my $what = shift;
 
-    # send Ctrl-B proactively
-    send_key 'ctrl-b';
-    send_key 'ctrl-b';
-    send_key 'ctrl-b';
-    send_key 'ctrl-b';
-    send_key 'ctrl-b';
-
-    assert_serial qr/Press Ctrl-B|Boot Menu/, 30;
-
-    # enter iPXE command-line (does nothing in a menu)
-    send_key 'ctrl-b';
-    send_key 'ctrl-b';
-    send_key 'ctrl-b';
-    send_key 'ctrl-b';
-    send_key 'ctrl-b';
-
     if ($flavour eq 'dasharo') {
         # assumming iPXE shell is the last menu item
-        send_key 'end';
-        send_key 'ret';
+        send_key('end', wait_screen_change => 1);
+        sleep 1;
+        send_key('ret', wait_screen_change => 1);
     } else {
-        # wait up to 10 seconds, then assume we're in a shell
-        assert_fuzzy_serial "iPXE>", 10;
+        # send Ctrl-B proactively
+        send_key 'ctrl-b';
+        send_key 'ctrl-b';
+        send_key 'ctrl-b';
+        send_key 'ctrl-b';
+        send_key 'ctrl-b';
+
+        assert_serial qr/Press Ctrl-B|Boot Menu/, 30;
+
+        # enter iPXE command-line (does nothing in a menu)
+        send_key 'ctrl-b';
+        send_key 'ctrl-b';
+        send_key 'ctrl-b';
+        send_key 'ctrl-b';
+        send_key 'ctrl-b';
     }
+
+    assert_fuzzy_serial "iPXE>", 30;
 
     # the use of && has a purpose: for some reason os-autoinst might have
     # trouble feeding any input to DUT after running dhcp command
@@ -552,6 +553,27 @@ ENDWORKAROUND
 
     save_tmp_file('ks.cfg', $ks_cfg);
     return autoinst_url('/files/ks.cfg');
+}
+
+sub prepare_ipxe_script {
+    # additional Linux kernel parameters
+    my $extra_linux_params = shift;
+
+    my $openqa_url = get_var('QUBES_OS_OPENQA_URL');
+
+    # Assumption:
+    #     Installation ISO is mounted at `$QUBES_OS_OPENQA_URL/iso`.
+    my $ipxe = <<"ENDIPXE";
+#!ipxe
+set host ${openqa_url}
+set base \${host}/iso/images/pxeboot
+kernel \${base}/vmlinuz inst.repo=\${host}/iso inst.sshd reboot=pci plymouth.ignore-serial-consoles  ${extra_linux_params}
+initrd \${base}/initrd.img
+boot
+ENDIPXE
+
+    save_tmp_file('ipxe', $ipxe);
+    return autoinst_url('/files/ipxe');
 }
 
 1;

@@ -68,7 +68,7 @@ VNC-based setup for OptiPlex.  New setups should use VNC if possible (see
   - toggles `kvmd` after starting/stopping the tests
   - input is handled by VNC (`kvmd-vnc`)
   - Kickstart configuration is served by openQA worker
-  - installation is done from a drive mounted via PiKVM MSD
+  - installation is done over the network via iPXE
   - requires platform-specific changes in Qubes OS
 
 ## Usage information

@@ -1,21 +1,35 @@
 #!/bin/bash
 
-rte_ip=$1
-pikvm_ip=$2
-image=$3
+set -e
+
+web_dir=$1
+iso_image=$2
 # shellcheck disable=SC2034
-image_size=$4 # unused
+iso_image_size=$3 # unused
 
-if [ -z "$image" ]; then
-    echo "No image to flash, successfully doing nothing."
-    exit 0
-fi
-
-if [ ! -f "$image" ]; then
-    echo "error: couldn't find '$image'" 1>&2
+if [ $# -lt 2 ]; then
+    echo "error: Not enough arguments: $#." 1>&2
+    for arg; do
+        echo " - '$arg'." 1>&2
+    done
     exit 1
 fi
 
-image_name=$(basename "$image")
+if [ -z "$iso_image" ]; then
+    echo "error: No ISO image to flash." 1>&2
+    exit 1
+fi
 
-echo "Assuming '$image_name' is already connected on PiKVM side"
+if [ ! -f "$iso_image" ]; then
+    echo "error: couldn't find '$iso_image'" 1>&2
+    exit 1
+fi
+
+### Mount ISO and prepare other files accessed over the network ###
+### =========================================================== ###
+
+echo "flash: setting up data for network boot"
+
+sudo umount --quiet "$web_dir/iso" || true
+mkdir -p "$web_dir/iso"
+sudo mount -t iso9660 -o ro,nodev,nosuid,noexec "$iso_image" "$web_dir/iso"
