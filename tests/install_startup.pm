@@ -129,9 +129,8 @@ sub run {
         # Furthermore, merely pressing F2 once won't work - continuous presses
         # are needed, otherwise the input might not get recognized.
         assert_serial "to boot directly";
-        for (my $i = 0; $i <= 30; $i++) {
+        for (my $i = 0; $i < 30; $i++) {
             send_key 'f2';
-            sleep(0.25)
         }
         assert_screen 'nuc_box_booted_to_dasharo_ui', 30;
         send_key_until_needlematch('nuc_box_dasharo_ui_selected_one_time_boot', 'down');
